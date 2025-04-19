@@ -4,7 +4,7 @@ import classes from './header.module.scss'
 function Header() {
   return (
     <header className={classes.header}>
-      <Link>Realworld Blog</Link>
+      <Link to={'/'}>Realworld Blog</Link>
     </header>
   )
 }
