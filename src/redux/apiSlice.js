@@ -1,8 +1,8 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const blogApiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://blog-platform.kata.academy/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://blog-platform.kata.academy/api' }),
   endpoints: (builder) => ({
     getArticles: builder.query({
       query: (limit, offset) => `/articles?limit=${limit}&offset=${offset}`,
@@ -14,3 +14,4 @@ const blogApiSlice = createApi({
 })
 
 export { blogApiSlice }
+export const { useGetArticlesQuery } = blogApiSlice
