@@ -1,7 +1,9 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
-import { blogApiSlice } from './apiSlice.js'
+import blogApiSlice from './apiSlice.js'
+import articlesPageSlice from '/src/components/article_list/articlesPageSlice.js'
 
 const rootReducer = combineReducers({
+  articlesPage: articlesPageSlice.reducer,
   [blogApiSlice.reducerPath]: blogApiSlice.reducer,
 })
 
