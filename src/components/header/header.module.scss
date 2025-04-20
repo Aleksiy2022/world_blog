@@ -10,3 +10,14 @@
   line-height: 28px;
   background-color: #ffffff;
 }
+
+.header__title {
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 28px;
+  color: rgba(0, 0, 0, 0.85);
+
+  &:visited {
+    color: rgba(0, 0, 0, 0.85);
+  }
+}
