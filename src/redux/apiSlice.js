@@ -8,10 +8,10 @@ const blogApiSlice = createApi({
       query: ({ limit, offset }) => `/articles?limit=${limit}&offset=${offset}`,
     }),
     getArticleBySlug: builder.query({
-      query: (slug) => `/articles/${slug}`,
-    })
-  })
+      query: ({ slug }) => `/articles/${slug}`,
+    }),
+  }),
 })
 
 export default blogApiSlice
-export const { useGetArticlesQuery } = blogApiSlice
+export const { useGetArticlesQuery, useGetArticleBySlugQuery } = blogApiSlice
