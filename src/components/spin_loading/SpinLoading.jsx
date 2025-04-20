@@ -1,9 +1,11 @@
 import { Spin } from 'antd'
 
+import classes from './spin-loading.module.scss'
+
 function SpinLoading() {
   return (
     <Spin tip="Loading" size="large">
-      <div className={'loading'} />
+      <div className={classes['loading']} />
     </Spin>
   )
 }
