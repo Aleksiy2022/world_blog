@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { Pagination } from 'antd'
+import { Pagination, Alert } from 'antd'
 
 import { ArticleInfo } from '../article/Article.jsx'
 import SpinLoading from '../spin_loading/SpinLoading.jsx'
@@ -15,9 +15,20 @@ function ArticleList() {
   const curPage = useSelector(selectPage)
   const offset = (curPage - 1) * 5
 
-  const { data: articlesData, isLoading } = useGetArticlesQuery({ limit: 5, offset })
+  const { data: articlesData, isLoading, isError } = useGetArticlesQuery({ limit: 5, offset })
   console.log(useGetArticlesQuery({ limit: 5, offset }))
   let articlesToView = null
+
+  if (isError) {
+    return (
+      <Alert
+        message="Error"
+        description="Не удалось загрузить статьи. Пожалуйста, перезагрузите страницу или попробуйте еще раз позже."
+        type="error"
+        showIcon
+      />
+    )
+  }
 
   if (isLoading) {
     return <SpinLoading />

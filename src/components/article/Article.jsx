@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router'
 import Markdown from 'react-markdown'
 import { format } from 'date-fns'
-import { Tag } from 'antd'
+import { Alert, Tag } from 'antd'
 
 import SpinLoading from '../spin_loading/SpinLoading.jsx'
 
@@ -14,7 +14,18 @@ import { useGetArticleBySlugQuery } from '@/redux/apiSlice.js'
 function Article() {
   let params = useParams()
   let slug = params.slug
-  const { data, isLoading } = useGetArticleBySlugQuery({ slug })
+  const { data, isLoading, isError } = useGetArticleBySlugQuery({ slug })
+
+  if (isError) {
+    return (
+      <Alert
+        message="Error"
+        description="Не удалось загрузить статью. Пожалуйста, перезагрузите страницу или попробуйте еще раз позже."
+        type="error"
+        showIcon
+      />
+    )
+  }
 
   if (isLoading) {
     return <SpinLoading />
