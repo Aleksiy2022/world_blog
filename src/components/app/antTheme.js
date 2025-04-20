@@ -6,11 +6,11 @@ const theme = {
       colorPrimary: '#FFFFFF',
       colorPrimaryHover: 'none',
       controlHeight: 24,
-      fontSize: 12
+      fontSize: 12,
     },
     Tag: {
       defaultBg: '#FFFFFF',
-    }
+    },
   },
 }
 
