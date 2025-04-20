@@ -3,6 +3,8 @@ import Markdown from 'react-markdown'
 import { format } from 'date-fns'
 import { Tag } from 'antd'
 
+import SpinLoading from '../spin_loading/SpinLoading.jsx'
+
 import classes from './article.module.scss'
 import likeImage from './image/like.svg'
 
@@ -12,7 +14,11 @@ import { useGetArticleBySlugQuery } from '@/redux/apiSlice.js'
 function Article() {
   let params = useParams()
   let slug = params.slug
-  const { data } = useGetArticleBySlugQuery({ slug })
+  const { data, isLoading } = useGetArticleBySlugQuery({ slug })
+
+  if (isLoading) {
+    return <SpinLoading />
+  }
 
   let content = null
   if (data) {

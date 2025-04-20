@@ -2,6 +2,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Pagination } from 'antd'
 
 import { ArticleInfo } from '../article/Article.jsx'
+import SpinLoading from '../spin_loading/SpinLoading.jsx'
 
 import { selectPage, setPage } from './articlesPageSlice.js'
 import classes from './article-list.module.scss'
@@ -14,8 +15,13 @@ function ArticleList() {
   const curPage = useSelector(selectPage)
   const offset = (curPage - 1) * 5
 
-  const { data: articlesData } = useGetArticlesQuery({ limit: 5, offset })
+  const { data: articlesData, isLoading } = useGetArticlesQuery({ limit: 5, offset })
+  console.log(useGetArticlesQuery({ limit: 5, offset }))
   let articlesToView = null
+
+  if (isLoading) {
+    return <SpinLoading />
+  }
 
   if (articlesData) {
     articlesToView = articlesData.articles.map((article) => {
