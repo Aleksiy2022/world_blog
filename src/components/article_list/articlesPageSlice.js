@@ -10,13 +10,12 @@ const articlesPageSlice = createSlice({
   reducers: {
     setPage: (state, action) => {
       const { page } = action.payload
-      console.log('page: ', page)
       state.page = page
-    } ,
+    },
   },
   selectors: {
     selectPage: (state) => state.page,
-  }
+  },
 })
 
 export const { setPage } = articlesPageSlice.actions
