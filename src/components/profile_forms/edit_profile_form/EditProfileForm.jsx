@@ -1,5 +1,4 @@
-import { Button, Form, Input, Checkbox } from 'antd'
-import { Link } from 'react-router'
+import { Button, Form, Input } from 'antd'
 
 import classes from '../profile-form.module.scss'
 
