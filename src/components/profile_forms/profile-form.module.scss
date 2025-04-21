@@ -45,6 +45,12 @@
   &__link {
     text-decoration: none;
     color: #1890ff;
+
+    &:hover {
+      transition: all 0.4s;
+      opacity: 0.5;
+    }
+
     &:visited {
       color: #1890ff
     }
