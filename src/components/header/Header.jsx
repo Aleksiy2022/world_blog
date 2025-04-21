@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { Flex, } from 'antd'
+import { Flex } from 'antd'
 
 import classes from './header.module.scss'
 
@@ -12,14 +12,24 @@ function Header() {
         </Link>
       </h1>
       <Flex>
-        <Link to={'/sign-in'} className={`
+        <Link
+          to={'/sign-in'}
+          className={`
             ${classes['header__link']}
             ${classes['header__link--sign-in']}
-          `}>Sign In</Link>
-        <Link to={'/sign-up'} className={`
+          `}
+        >
+          Sign In
+        </Link>
+        <Link
+          to={'/sign-up'}
+          className={`
             ${classes['header__link']}
             ${classes['header__link--sign-up']}
-          `}>Sign Up</Link>
+          `}
+        >
+          Sign Up
+        </Link>
       </Flex>
     </header>
   )
