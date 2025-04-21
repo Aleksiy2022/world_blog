@@ -11,7 +11,6 @@ import EditProfileForm from '../profile_forms/edit_profile_form/EditProfileForm.
 import classes from './app.module.scss'
 import { theme } from './antTheme.js'
 
-
 function App() {
   return (
     <ConfigProvider theme={theme}>
