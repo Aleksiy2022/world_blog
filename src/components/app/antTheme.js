@@ -17,8 +17,8 @@ const theme = {
     },
     Input: {
       paddingBlock: '8.2px',
-      paddingInline: '11px'
-    }
+      paddingInline: '11px',
+    },
   },
 }
 
