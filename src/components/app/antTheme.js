@@ -11,6 +11,14 @@ const theme = {
     Tag: {
       defaultBg: '#FFFFFF',
     },
+    Form: {
+      verticalLabelPadding: '0 0 2px',
+      itemMarginBottom: 12,
+    },
+    Input: {
+      paddingBlock: '8.2px',
+      paddingInline: '11px'
+    }
   },
 }
 
