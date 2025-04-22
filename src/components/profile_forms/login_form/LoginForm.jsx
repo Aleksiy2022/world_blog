@@ -1,23 +1,43 @@
 import { Button, Form, Input } from 'antd'
 import { Link } from 'react-router'
 import { useForm, Controller } from 'react-hook-form'
+import { useEffect } from 'react'
 
 import classes from '../profile-form.module.scss'
 
+// eslint-disable-next-line import/no-unresolved
+import { useLoginMutation } from '@/redux/apiSlice.js'
+
 function LoginForm() {
+  const [login, { isError, error }] = useLoginMutation()
+  const savedAuthData = JSON.parse(localStorage.getItem('blogRegisterData'))
   const {
     handleSubmit,
     control,
     formState: { errors },
+    setError,
   } = useForm({
     defaultValues: {
-      email: '',
+      email: savedAuthData.email,
       password: '',
     },
   })
 
-  const onSubmit = (data) => {
-    console.log(data)
+  useEffect(() => {
+    if (error?.data.errors) {
+      setError('email', error.data.errors['email or password'])
+      setError('password', error.data.errors['email or password'])
+    }
+  }, [isError])
+
+  const onSubmit = async (formData) => {
+    const loginData = { user: { ...formData } }
+    const jwt = JSON.parse(localStorage.getItem('blogRegisterData')).token
+    const response = await login({ loginData, jwt })
+    const userData = response.data?.user
+    if (userData) {
+      localStorage.setItem('blogAuthData', JSON.stringify(userData))
+    }
   }
 
   return (
@@ -27,7 +47,7 @@ function LoginForm() {
         <Form.Item
           label="Email address"
           validateStatus={errors.email ? 'error' : ''}
-          help={errors.email ? 'Email is required' : ''}
+          help={errors.email ? (isError ? 'Email or password is invalid' : 'Email is required') : ''}
         >
           <Controller
             name="email"

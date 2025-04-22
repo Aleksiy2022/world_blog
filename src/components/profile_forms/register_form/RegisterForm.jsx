@@ -1,14 +1,20 @@
-import { Button, Form, Input, Checkbox } from 'antd'
+import { Button, Checkbox, Form, Input } from 'antd'
 import { Link } from 'react-router'
-import { useForm, Controller } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
+import { useEffect } from 'react'
 
+import { getJwtExpiration } from '../utils.js'
 import classes from '../profile-form.module.scss'
+
+// eslint-disable-next-line import/no-unresolved
+import { useCreateNewUserMutation } from '@/redux/apiSlice.js'
 
 function RegisterForm() {
   const {
     handleSubmit,
     control,
     formState: { errors },
+    setError,
   } = useForm({
     defaultValues: {
       username: '',
@@ -19,8 +25,34 @@ function RegisterForm() {
     },
   })
 
-  const onSubmit = (data) => {
-    console.log(data)
+  const [createNewUser, { isError, error }] = useCreateNewUserMutation()
+
+  useEffect(() => {
+    if (error?.data.errors.username) {
+      setError('username', error.data.errors.username)
+    }
+    if (error?.data.errors.email) {
+      setError('email', error.data.errors.email)
+    }
+  }, [isError])
+
+  const onSubmit = async (formData) => {
+    const userData = {
+      user: {
+        username: formData.username,
+        email: formData.email.toLowerCase(),
+        password: formData.password,
+      },
+    }
+    const response = await createNewUser(userData)
+    if (response?.data) {
+      const user = response.data.user
+      const authData = {
+        ...user,
+        expiresAt: getJwtExpiration(user.token),
+      }
+      localStorage.setItem('blogRegisterData', JSON.stringify(authData))
+    }
   }
 
   return (
@@ -30,7 +62,13 @@ function RegisterForm() {
         <Form.Item
           label="Username"
           validateStatus={errors.username ? 'error' : ''}
-          help={errors.username ? 'Username is required' : ''}
+          help={
+            errors.username
+              ? isError && error.data.errors.username
+                ? `Username is already taken.`
+                : 'Username is required'
+              : ''
+          }
         >
           <Controller
             name="username"
@@ -45,7 +83,7 @@ function RegisterForm() {
                 value: 20,
                 message: 'Your username needs to be no more than 20 characters.',
               },
-          }}
+            }}
             render={({ field }) => <Input {...field} placeholder="Username" />}
           />
         </Form.Item>
@@ -53,7 +91,9 @@ function RegisterForm() {
         <Form.Item
           label="Email address"
           validateStatus={errors.email ? 'error' : ''}
-          help={errors.email ? 'Email is required' : ''}
+          help={
+            errors.email ? (isError && error.data.errors.email ? `Email is already taken.` : 'Email is required') : ''
+          }
         >
           <Controller
             name="email"
@@ -81,7 +121,7 @@ function RegisterForm() {
                 value: 40,
                 message: 'Your password needs to be no more than 40 characters.',
               },
-          }}
+            }}
             render={({ field }) => <Input.Password {...field} placeholder="Password" />}
           />
         </Form.Item>
