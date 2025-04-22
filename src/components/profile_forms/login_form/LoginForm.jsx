@@ -2,13 +2,19 @@ import { Button, Form, Input } from 'antd'
 import { Link } from 'react-router'
 import { useForm, Controller } from 'react-hook-form'
 import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from "react-router";
 
+import { setProfile } from '../profileSlice.js'
 import classes from '../profile-form.module.scss'
 
 // eslint-disable-next-line import/no-unresolved
 import { useLoginMutation } from '@/redux/apiSlice.js'
 
 function LoginForm() {
+  const dispatch = useDispatch()
+  let navigate = useNavigate();
+
   const [login, { isError, error }] = useLoginMutation()
   const savedAuthData = JSON.parse(localStorage.getItem('blogRegisterData'))
   const {
@@ -37,6 +43,9 @@ function LoginForm() {
     const userData = response.data?.user
     if (userData) {
       localStorage.setItem('blogAuthData', JSON.stringify(userData))
+      const { username, image, email } = userData
+      dispatch(setProfile({username, image, email}))
+      navigate("/profile")
     }
   }
 
