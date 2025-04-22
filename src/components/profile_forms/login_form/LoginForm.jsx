@@ -1,9 +1,8 @@
 import { Button, Form, Input } from 'antd'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { useForm, Controller } from 'react-hook-form'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from "react-router";
 
 import { setProfile } from '../profileSlice.js'
 import classes from '../profile-form.module.scss'
