@@ -3,13 +3,13 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import blogApiSlice from './apiSlice.js'
 
 // eslint-disable-next-line import/no-unresolved
-import profileSlice from '@/components/profile_forms/profileSlice.js'
+import authSlice from '@/components/profile_forms/authSlice.js'
 // eslint-disable-next-line import/no-unresolved
 import articlesPageSlice from '@/components/article_list/articlesPageSlice.js'
 
 const rootReducer = combineReducers({
   articlesPage: articlesPageSlice.reducer,
-  profile: profileSlice.reducer,
+  auth: authSlice.reducer,
   [blogApiSlice.reducerPath]: blogApiSlice.reducer,
 })
 
