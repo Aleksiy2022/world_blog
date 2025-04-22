@@ -1,15 +1,16 @@
 import { Button, Checkbox, Form, Input } from 'antd'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { Controller, useForm } from 'react-hook-form'
 import { useEffect } from 'react'
 
-import { getJwtExpiration } from '../utils.js'
 import classes from '../profile-form.module.scss'
 
 // eslint-disable-next-line import/no-unresolved
 import { useCreateNewUserMutation } from '@/redux/apiSlice.js'
 
 function RegisterForm() {
+  const navigate = useNavigate()
+
   const {
     handleSubmit,
     control,
@@ -44,14 +45,12 @@ function RegisterForm() {
         password: formData.password,
       },
     }
-    const response = await createNewUser(userData)
+    const response = await createNewUser({ userData })
     if (response?.data) {
-      const user = response.data.user
-      const authData = {
-        ...user,
-        expiresAt: getJwtExpiration(user.token),
-      }
-      localStorage.setItem('blogRegisterData', JSON.stringify(authData))
+      const jwt = response.data.user.token
+      const email = response.data.user.email
+      localStorage.setItem('blogRegisterData', JSON.stringify({ 'token': jwt, 'email': email }))
+      navigate('/sign-in')
     }
   }
 
@@ -66,7 +65,7 @@ function RegisterForm() {
             errors.username
               ? isError && error.data.errors.username
                 ? `Username is already taken.`
-                : 'Username is required'
+                : errors.username.message
               : ''
           }
         >
@@ -74,7 +73,7 @@ function RegisterForm() {
             name="username"
             control={control}
             rules={{
-              required: true,
+              required: 'Username is required',
               minLength: {
                 value: 3,
                 message: 'Your username needs to be at least 3 characters.',
@@ -166,7 +165,6 @@ function RegisterForm() {
         <Link to="/sign-in" className={classes['form__link']}>
           Sign In
         </Link>
-        .
       </span>
     </div>
   )

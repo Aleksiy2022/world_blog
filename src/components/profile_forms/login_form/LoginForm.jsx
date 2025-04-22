@@ -4,18 +4,19 @@ import { useForm, Controller } from 'react-hook-form'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { setProfile } from '../profileSlice.js'
+import { setAuth } from '../authSlice.js'
 import classes from '../profile-form.module.scss'
 
 // eslint-disable-next-line import/no-unresolved
 import { useLoginMutation } from '@/redux/apiSlice.js'
 
+
 function LoginForm() {
   const dispatch = useDispatch()
-  let navigate = useNavigate();
+  let navigate = useNavigate()
 
   const [login, { isError, error }] = useLoginMutation()
-  const savedAuthData = JSON.parse(localStorage.getItem('blogRegisterData'))
+  const savedRegData = JSON.parse(localStorage.getItem('blogRegisterData'))
   const {
     handleSubmit,
     control,
@@ -23,7 +24,7 @@ function LoginForm() {
     setError,
   } = useForm({
     defaultValues: {
-      email: savedAuthData.email,
+      email: savedRegData?.email,
       password: '',
     },
   })
@@ -37,13 +38,14 @@ function LoginForm() {
 
   const onSubmit = async (formData) => {
     const loginData = { user: { ...formData } }
-    const jwt = JSON.parse(localStorage.getItem('blogRegisterData')).token
-    const response = await login({ loginData, jwt })
+    const regJwt = JSON.parse(localStorage.getItem('blogRegisterData')).token
+    const response = await login({ loginData, regJwt })
     const userData = response.data?.user
+
     if (userData) {
-      localStorage.setItem('blogAuthData', JSON.stringify(userData))
-      const { username, image, email } = userData
-      dispatch(setProfile({username, image, email}))
+      const authJwt = userData.token
+      localStorage.setItem('blogAuthToken', JSON.stringify(authJwt))
+      dispatch(setAuth())
       navigate("/profile")
     }
   }
