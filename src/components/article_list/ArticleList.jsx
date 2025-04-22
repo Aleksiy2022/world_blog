@@ -16,7 +16,6 @@ function ArticleList() {
   const offset = (curPage - 1) * 5
 
   const { data: articlesData, isLoading, isError } = useGetArticlesQuery({ limit: 5, offset })
-  console.log(useGetArticlesQuery({ limit: 5, offset }))
   let articlesToView = null
 
   if (isError) {
