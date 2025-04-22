@@ -11,7 +11,7 @@ const blogApiSlice = createApi({
       query: ({ slug }) => `/articles/${slug}`,
     }),
     createNewUser: builder.mutation({
-      query: (userData) => ({
+      query: ({ userData }) => ({
         url: '/users',
         method: 'POST',
         body: userData,
@@ -31,9 +31,34 @@ const blogApiSlice = createApi({
         },
       }),
     }),
+    getUser: builder.query({
+      query: ({ jwt }) => ({
+        url: `/user`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        }
+      }),
+    }),
+    updateUser: builder.mutation({
+      query: ({ userData, jwt }) => ({
+        url: `/user`,
+        method: 'PUT',
+        body: {'user' : userData},
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        }
+      })
+    })
   }),
 })
 
 export default blogApiSlice
-export const { useGetArticlesQuery, useGetArticleBySlugQuery, useCreateNewUserMutation, useLoginMutation } =
-  blogApiSlice
+export const {
+  useGetArticlesQuery,
+  useGetArticleBySlugQuery,
+  useCreateNewUserMutation,
+  useLoginMutation,
+  useGetUserQuery,
+  useUpdateUserMutation,
+} = blogApiSlice
