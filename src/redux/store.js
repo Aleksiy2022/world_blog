@@ -3,7 +3,7 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import blogApiSlice from './apiSlice.js'
 
 // eslint-disable-next-line import/no-unresolved
-import articlesPageSlice from '/src/components/article_list/articlesPageSlice.js'
+import articlesPageSlice from '@/components/article_list/articlesPageSlice.js'
 
 const rootReducer = combineReducers({
   articlesPage: articlesPageSlice.reducer,
