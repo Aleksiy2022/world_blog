@@ -11,6 +11,7 @@ function EditForm() {
   const [updateUser, { isLoading: isUpdate, isError, error }] = useUpdateUserMutation()
   const jwt = JSON.parse(localStorage.getItem('blogAuthToken'))
   const { data, isLoading: isGetUser } = useGetUserQuery({ jwt })
+
   const {
     handleSubmit,
     control,
@@ -123,11 +124,28 @@ function EditForm() {
           />
         </Form.Item>
 
-        <Form.Item label="Avatar image(url)">
+        <Form.Item
+          label="Avatar image(url)"
+          validateStatus={errors.image ? 'error' : ''}
+          help={errors.image ? errors.image.message : ''}
+        >
           <Controller
-            name='image'
+            name="image"
             control={control}
-            render={({ field }) => <Input {...field} placeholder="Avatar image"></Input>}
+            rules={{
+              validate: {
+                isUrl: value => {
+                  if (!value) return true // если поле не обязательно
+                  try {
+                    new URL(value)
+                    return true
+                  } catch (e) {
+                    return "Некорректный URL."
+                  }
+                },
+              }
+            }}
+            render={({ field }) => <Input {...field} placeholder="Avatar image" />}
           />
         </Form.Item>
 
