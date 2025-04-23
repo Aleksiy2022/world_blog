@@ -49,7 +49,7 @@ function RegisterForm() {
     if (response?.data) {
       const jwt = response.data.user.token
       const email = response.data.user.email
-      localStorage.setItem('blogRegisterData', JSON.stringify({ 'token': jwt, 'email': email }))
+      localStorage.setItem('blogRegisterData', JSON.stringify({ token: jwt, email: email }))
       navigate('/sign-in')
     }
   }
