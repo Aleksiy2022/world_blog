@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 const blogApiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://blog-platform.kata.academy/api' }),
+  tagTypes: ['User'],
   endpoints: (builder) => ({
     getArticles: builder.query({
       query: ({ limit, offset }) => `/articles?limit=${limit}&offset=${offset}`,
@@ -39,6 +40,7 @@ const blogApiSlice = createApi({
           Authorization: `Bearer ${jwt}`,
         },
       }),
+      providesTags: ['User'],
     }),
     updateUser: builder.mutation({
       query: ({ userData, jwt }) => ({
@@ -49,6 +51,7 @@ const blogApiSlice = createApi({
           Authorization: `Bearer ${jwt}`,
         },
       }),
+      invalidatesTags: ['User'],
     }),
   }),
 })
