@@ -46,7 +46,7 @@ function LoginForm() {
       const authJwt = userData.token
       localStorage.setItem('blogAuthToken', JSON.stringify(authJwt))
       dispatch(setAuth())
-      navigate("/profile")
+      navigate("/")
     }
   }
 
