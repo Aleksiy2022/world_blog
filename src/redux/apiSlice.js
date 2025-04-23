@@ -37,19 +37,19 @@ const blogApiSlice = createApi({
         method: 'GET',
         headers: {
           Authorization: `Bearer ${jwt}`,
-        }
+        },
       }),
     }),
     updateUser: builder.mutation({
       query: ({ userData, jwt }) => ({
         url: `/user`,
         method: 'PUT',
-        body: {'user' : userData},
+        body: { user: userData },
         headers: {
           Authorization: `Bearer ${jwt}`,
-        }
-      })
-    })
+        },
+      }),
+    }),
   }),
 })
 
