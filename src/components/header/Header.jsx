@@ -1,8 +1,9 @@
 import { Link } from 'react-router'
 import { Flex } from 'antd'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect } from 'react'
 
-import { selectAuth } from '../profile_forms/authSlice.js'
+import { selectAuth, setAuthorized, setUnauthorized } from '../profile_forms/authSlice.js'
 
 import classes from './header.module.scss'
 import avatar from './image/avatar.jpg'
@@ -11,11 +12,24 @@ import avatar from './image/avatar.jpg'
 import { useGetUserQuery } from '@/redux/apiSlice.js'
 
 function Header() {
+  const dispatch = useDispatch()
   const authStatus = useSelector(selectAuth)
-  const jwt = JSON.parse(localStorage.getItem('blogAuthToken'))
-  const { data: curUser } = useGetUserQuery({ jwt })
+  const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
+  const { data: curUser } = useGetUserQuery({ jwt: jwtData?.authJwt })
 
-  const signInLink = (
+  useEffect(() => {
+    if (jwtData && Date.now() < jwtData.expiresAt) {
+      dispatch(setAuthorized())
+    }
+  }, [dispatch, jwtData])
+
+  function handleLogout(evt) {
+    evt.preventDefault()
+    localStorage.removeItem('blogAuthTokenData')
+    dispatch(setUnauthorized())
+  }
+
+  const signIn = (
     <Link
       to={'/sign-in'}
       className={`
@@ -27,6 +41,31 @@ function Header() {
     </Link>
   )
 
+  const logOut = (
+    <Link
+      to={'/'}
+      className={`
+            ${classes['header__link']}
+            ${classes['header__link--log-out']}
+          `}
+      onClick={handleLogout}
+    >
+      Log Out
+    </Link>
+  )
+
+  const signUp = (
+    <Link
+      to={'/sign-up'}
+      className={`
+            ${classes['header__link']}
+            ${classes['header__link--sign-up']}
+          `}
+    >
+      Sign Up
+    </Link>
+  )
+
   const userActionsPanel = (
     <div className={classes['header__actions-panel']}>
       <Link
@@ -34,26 +73,19 @@ function Header() {
         className={`
             ${classes['header__link']}
             ${classes['header__link--article']}
-          `}>
+          `}
+      >
         Create article
       </Link>
       <Link to={'/profile'} className={classes['header__profile-link']}>
-        <span>{ curUser ? curUser.user.username : null }</span>
-        <img className={classes['header__profile-img']} src={curUser ? curUser.user.image ? curUser.user.image : avatar : null} alt="аватар"/>
+        <span>{curUser ? curUser.user.username : null}</span>
+        <img
+          className={classes['header__profile-img']}
+          src={curUser ? (curUser.user.image ? curUser.user.image : avatar) : null}
+          alt="аватар"
+        />
       </Link>
     </div>
-  )
-
-  const authActionLink  = (
-    <Link
-      to={ authStatus ? '/' : '/sign-up'}
-      className={`
-            ${classes['header__link']}
-            ${ authStatus ? classes['header__link--log-out'] : classes['header__link--sign-up']}
-          `}
-    >
-      { authStatus ? 'Log Out' : 'Sign Up' }
-    </Link>
   )
 
   return (
@@ -64,8 +96,8 @@ function Header() {
         </Link>
       </h1>
       <Flex>
-        { authStatus ? userActionsPanel : signInLink }
-        { authActionLink }
+        {authStatus ? userActionsPanel : signIn}
+        {authStatus ? logOut : signUp}
       </Flex>
     </header>
   )
