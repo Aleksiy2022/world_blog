@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { Flex } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
@@ -13,6 +13,7 @@ import { useGetUserQuery } from '@/redux/apiSlice.js'
 
 function Header() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const authStatus = useSelector(selectAuth)
   const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
   const { data: curUser } = useGetUserQuery({ jwt: jwtData?.authJwt })
@@ -27,6 +28,7 @@ function Header() {
     evt.preventDefault()
     localStorage.removeItem('blogAuthTokenData')
     dispatch(setUnauthorized())
+    navigate('/')
   }
 
   const signIn = (
