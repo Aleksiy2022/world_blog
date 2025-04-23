@@ -5,11 +5,17 @@ import { useSelector } from 'react-redux'
 import { selectAuth } from '../profile_forms/authSlice.js'
 
 import classes from './header.module.scss'
+import avatar from './image/avatar.jpg'
 
+// eslint-disable-next-line import/no-unresolved
+import { useGetUserQuery } from '@/redux/apiSlice.js'
 
 function Header() {
   const authStatus = useSelector(selectAuth)
-  const signIn = (
+  const jwt = JSON.parse(localStorage.getItem('blogAuthToken'))
+  const { data: curUser } = useGetUserQuery({ jwt })
+
+  const signInLink = (
     <Link
       to={'/sign-in'}
       className={`
@@ -21,7 +27,24 @@ function Header() {
     </Link>
   )
 
-  const signUp = (
+  const userActionsPanel = (
+    <div className={classes['header__actions-panel']}>
+      <Link
+        to={'/'}
+        className={`
+            ${classes['header__link']}
+            ${classes['header__link--article']}
+          `}>
+        Create article
+      </Link>
+      <Link to={'/profile'} className={classes['header__profile-link']}>
+        <span>{ curUser ? curUser.user.username : null }</span>
+        <img className={classes['header__profile-img']} src={curUser ? curUser.user.image ? curUser.user.image : avatar : null} alt="аватар"/>
+      </Link>
+    </div>
+  )
+
+  const authActionLink  = (
     <Link
       to={ authStatus ? '/' : '/sign-up'}
       className={`
@@ -41,8 +64,8 @@ function Header() {
         </Link>
       </h1>
       <Flex>
-        { signIn }
-        { signUp }
+        { authStatus ? userActionsPanel : signInLink }
+        { authActionLink }
       </Flex>
     </header>
   )
