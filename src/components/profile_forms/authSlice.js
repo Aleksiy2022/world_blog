@@ -8,15 +8,18 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setAuth(state) {
-      state.isAuthorized = true;
-    }
+    setAuthorized(state) {
+      state.isAuthorized = true
+    },
+    setUnauthorized(state) {
+      state.isAuthorized = false
+    },
   },
   selectors: {
-    selectAuth: state => state.isAuthorized,
+    selectAuth: (state) => state.isAuthorized,
   },
 })
 
 export default authSlice
-export const { setAuth } = authSlice.actions
+export const { setAuthorized, setUnauthorized } = authSlice.actions
 export const { selectAuth } = authSlice.selectors
