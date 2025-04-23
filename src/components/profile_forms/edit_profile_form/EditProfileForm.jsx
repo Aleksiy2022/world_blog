@@ -17,13 +17,13 @@ function EditForm() {
     control,
     formState: { errors },
     setValue,
-    setError
+    setError,
   } = useForm({
     defaultValues: {
       username: undefined,
       email: undefined,
       password: undefined,
-      image: null
+      image: null,
     },
   })
 
@@ -45,11 +45,11 @@ function EditForm() {
   }, [isError])
 
   const onSubmit = async (userData) => {
-    const response = await updateUser({ userData, jwt})
+    const response = await updateUser({ userData, jwt })
     if (!isError) {
       const newRegJwt = response.data.user.token
       const email = response.data.user.email
-      localStorage.setItem('blogRegisterData', JSON.stringify({ 'token': newRegJwt, 'email': email }))
+      localStorage.setItem('blogRegisterData', JSON.stringify({ token: newRegJwt, email: email }))
     }
   }
 
@@ -134,16 +134,16 @@ function EditForm() {
             control={control}
             rules={{
               validate: {
-                isUrl: value => {
+                isUrl: (value) => {
                   if (!value) return true // если поле не обязательно
                   try {
                     new URL(value)
                     return true
                   } catch (e) {
-                    return "Некорректный URL."
+                    return 'Некорректный URL.'
                   }
                 },
-              }
+              },
             }}
             render={({ field }) => <Input {...field} placeholder="Avatar image" />}
           />
@@ -165,11 +165,7 @@ function EditForm() {
       </Spin>
     )
   } else {
-    return (
-      <>
-        {content}
-      </>
-    )
+    return <>{content}</>
   }
 }
 

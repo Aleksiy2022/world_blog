@@ -4,12 +4,12 @@ import { useForm, Controller } from 'react-hook-form'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { setAuth } from '../authSlice.js'
+import { setAuthorized } from '../authSlice.js'
 import classes from '../profile-form.module.scss'
+import { getJwtExpiration } from '../utils.js'
 
 // eslint-disable-next-line import/no-unresolved
 import { useLoginMutation } from '@/redux/apiSlice.js'
-
 
 function LoginForm() {
   const dispatch = useDispatch()
@@ -44,9 +44,10 @@ function LoginForm() {
 
     if (userData) {
       const authJwt = userData.token
-      localStorage.setItem('blogAuthToken', JSON.stringify(authJwt))
-      dispatch(setAuth())
-      navigate("/")
+      const expiresAt = getJwtExpiration(authJwt)
+      localStorage.setItem('blogAuthTokenData', JSON.stringify({ authJwt: authJwt, expiresAt: expiresAt }))
+      dispatch(setAuthorized())
+      navigate('/')
     }
   }
 
