@@ -37,7 +37,9 @@ function Article() {
     content = (
       <article className={classes['article-wrapper']}>
         <ArticleInfo article={data.article} />
-        <Markdown>{body}</Markdown>
+        <div className={classes['article__content']}>
+          <Markdown>{body}</Markdown>
+        </div>
       </article>
     )
   }
@@ -56,17 +58,23 @@ function ArticleInfo({ article }) {
     )
   })
 
+  function handleFavorite() {
+    console.log('handleFavorite clicked')
+  }
+
   return (
     <div className={classes['article']}>
       <div className={classes['article__info']}>
         <div className={classes['title-wrapper']}>
-          <h3 className={classes['article__title']}>
+          <h5 className={classes['article__title']}>
             <Link to={`/articles/${slug}`} className={`link-reset ${classes['article__link']}`}>
               {title}
             </Link>
-          </h3>
-          <img src={likeImage} alt="лайка" className={classes['article__likes-img']} />
-          <span className={classes['article__likes-count']}>{favoritesCount}</span>
+          </h5>
+          <button className={classes['article__favorite-btn']} onClick={handleFavorite}>
+            <img src={likeImage} alt="лайка" className={classes['article__favorite-img']} />
+          </button>
+          <span className={classes['article__favorite-count']}>{favoritesCount}</span>
         </div>
         <ul className={`list-reset ${classes['article__tags-wrapper']}`}>{tagsToView}</ul>
         <p className={classes['article__description']}>{description}</p>
