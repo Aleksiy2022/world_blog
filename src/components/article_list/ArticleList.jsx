@@ -14,8 +14,9 @@ function ArticleList() {
   const dispatch = useDispatch()
   const curPage = useSelector(selectPage)
   const offset = (curPage - 1) * 5
+  const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
 
-  const { data: articlesData, isLoading, isError } = useGetArticlesQuery({ limit: 5, offset })
+  const { data: articlesData, isLoading, isError } = useGetArticlesQuery({ limit: 5, offset, jwt: jwtData?.authJwt })
   let articlesToView = null
 
   if (isError) {

@@ -3,13 +3,23 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 const blogApiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://blog-platform.kata.academy/api' }),
-  tagTypes: ['User'],
+  tagTypes: ['User', 'Article'],
   endpoints: (builder) => ({
     getArticles: builder.query({
-      query: ({ limit, offset }) => `/articles?limit=${limit}&offset=${offset}`,
+      query: ({ limit, offset, jwt = null }) => ({
+        url: `/articles?limit=${limit}&offset=${offset}`,
+        method: 'GET',
+        headers: jwt ? { Authorization: `Bearer ${jwt}` } : undefined,
+      }),
+      providesTags: ['Article'],
     }),
     getArticleBySlug: builder.query({
-      query: ({ slug }) => `/articles/${slug}`,
+      query: ({ slug, jwt = null }) => ({
+        url: `/articles/${slug}`,
+        method: 'GET',
+        headers: jwt ? { Authorization: `Bearer ${jwt}` } : undefined,
+      }),
+      providesTags: ['Article'],
     }),
     createNewUser: builder.mutation({
       query: ({ userData }) => ({
@@ -41,6 +51,7 @@ const blogApiSlice = createApi({
         },
       }),
       providesTags: ['User'],
+      invalidatesTags: ['Article'],
     }),
     updateUser: builder.mutation({
       query: ({ userData, jwt }) => ({
@@ -48,10 +59,33 @@ const blogApiSlice = createApi({
         method: 'PUT',
         body: { user: userData },
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${jwt}`,
         },
       }),
       invalidatesTags: ['User'],
+    }),
+    favoriteArticle: builder.mutation({
+      query: ({ slug, jwt }) => ({
+        url: `/articles/${slug}/favorite`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwt}`,
+        },
+      }),
+      invalidatesTags: ['Article'],
+    }),
+    unFavoriteArticle: builder.mutation({
+      query: ({ slug, jwt }) => ({
+        url: `/articles/${slug}/favorite`,
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwt}`,
+        },
+      }),
+      invalidatesTags: ['Article'],
     }),
   }),
 })
@@ -64,4 +98,6 @@ export const {
   useLoginMutation,
   useGetUserQuery,
   useUpdateUserMutation,
+  useFavoriteArticleMutation,
+  useUnFavoriteArticleMutation,
 } = blogApiSlice
