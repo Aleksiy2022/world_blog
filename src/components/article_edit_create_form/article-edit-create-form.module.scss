@@ -1,0 +1,36 @@
+.form {
+  &__wrapper {
+    width: 100%;
+    max-width: 938px;
+    padding: 48px 32px 27px 32px;
+    background-color: #fff;
+  }
+
+  &__title {
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding-bottom: 21px;
+  }
+
+  &__add-btn {
+    padding: 8px 40px;
+    border-radius: 4px;
+  }
+
+  &__delete-btn {
+    margin-left: 17px;
+    padding: 8px 36px;
+    border-radius: 4px;
+  }
+
+  &__send-btn {
+    width: 39%;
+  }
+
+  &__tag_wrapper {
+    &:not(:last-child) {
+      margin-bottom: 5px;
+    }
+  }
+}
