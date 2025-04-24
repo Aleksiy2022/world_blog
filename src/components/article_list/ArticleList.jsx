@@ -18,7 +18,7 @@ function ArticleList() {
 
   const { data: articlesData, isLoading, isError } = useGetArticlesQuery({ limit: 5, offset, jwt: jwtData?.authJwt })
   let articlesToView = null
-
+  console.log(isLoading)
   if (isError) {
     return (
       <Alert
