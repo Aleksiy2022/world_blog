@@ -8,7 +8,7 @@ import classes from '../profile-form.module.scss'
 // eslint-disable-next-line import/no-unresolved
 import { useGetUserQuery, useUpdateUserMutation } from '@/redux/apiSlice.js'
 
-function EditForm({ authStatus }) {
+function EditForm() {
 
   const [updateUser, { isLoading: isUpdate, isError, error }] = useUpdateUserMutation()
   const jwt = JSON.parse(localStorage.getItem('blogAuthToken'))
@@ -159,10 +159,6 @@ function EditForm({ authStatus }) {
       </Form>
     </div>
   )
-
-  if (!authStatus) {
-    return <Navigate to={'/sign-in'} />
-  }
 
   if (isGetUser || isUpdate) {
     return (
