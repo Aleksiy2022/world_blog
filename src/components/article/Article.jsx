@@ -1,20 +1,24 @@
-import { Link, useParams } from 'react-router'
+import { Link, useParams, useNavigate } from 'react-router'
 import Markdown from 'react-markdown'
 import { format } from 'date-fns'
 import { Alert, Tag } from 'antd'
+import { useSelector } from 'react-redux'
 
+import { selectAuth } from '../profile_forms/authSlice.js'
 import SpinLoading from '../spin_loading/SpinLoading.jsx'
 
 import classes from './article.module.scss'
-import likeImage from './image/like.svg'
+import unFavoriteImage from './image/unfavorite.svg'
+import favoriteImage from './image/favorite.svg'
 
 // eslint-disable-next-line import/no-unresolved
-import { useGetArticleBySlugQuery } from '@/redux/apiSlice.js'
+import { useGetArticleBySlugQuery, useFavoriteArticleMutation, useUnFavoriteArticleMutation } from '@/redux/apiSlice.js'
 
 function Article() {
-  let params = useParams()
-  let slug = params.slug
-  const { data, isLoading, isError } = useGetArticleBySlugQuery({ slug })
+  const params = useParams()
+  const slug = params.slug
+  const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
+  const { data, isLoading, isError } = useGetArticleBySlugQuery({ slug, jwt: jwtData?.authJwt })
 
   if (isError) {
     return (
@@ -47,7 +51,11 @@ function Article() {
 }
 
 function ArticleInfo({ article }) {
-  const { title, slug, favoritesCount, tagList, description, author, createdAt, updatedAt } = article
+  const authStatus = useSelector(selectAuth)
+  const navigate = useNavigate()
+  const [favoriteArticle] = useFavoriteArticleMutation()
+  const [unFavoritedArticle] = useUnFavoriteArticleMutation()
+  const { title, slug, favorited, favoritesCount, tagList, description, author, createdAt, updatedAt } = article
   const articleDate = format(new Date(updatedAt ? updatedAt : createdAt), 'MMMM d, yyyy')
 
   const tagsToView = tagList.map((tag, index) => {
@@ -59,7 +67,16 @@ function ArticleInfo({ article }) {
   })
 
   function handleFavorite() {
-    console.log('handleFavorite clicked')
+    const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
+    if (authStatus && !favorited) {
+      favoriteArticle({ slug, jwt: jwtData.authJwt })
+    }
+    if (authStatus && favorited) {
+      unFavoritedArticle({ slug, jwt: jwtData.authJwt })
+    }
+    if (!authStatus) {
+      navigate('/sign-in')
+    }
   }
 
   return (
@@ -72,7 +89,11 @@ function ArticleInfo({ article }) {
             </Link>
           </h5>
           <button className={classes['article__favorite-btn']} onClick={handleFavorite}>
-            <img src={likeImage} alt="лайка" className={classes['article__favorite-img']} />
+            <img
+              src={favorited ? favoriteImage : unFavoriteImage}
+              alt="лайка"
+              className={classes['article__favorite-img']}
+            />
           </button>
           <span className={classes['article__favorite-count']}>{favoritesCount}</span>
         </div>

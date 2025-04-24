@@ -1,13 +1,15 @@
 import { Button, Form, Input, Spin } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { useEffect } from 'react'
+import { Navigate } from 'react-router'
 
 import classes from '../profile-form.module.scss'
 
 // eslint-disable-next-line import/no-unresolved
 import { useGetUserQuery, useUpdateUserMutation } from '@/redux/apiSlice.js'
 
-function EditForm() {
+function EditForm({ authStatus }) {
+
   const [updateUser, { isLoading: isUpdate, isError, error }] = useUpdateUserMutation()
   const jwt = JSON.parse(localStorage.getItem('blogAuthToken'))
   const { data, isLoading: isGetUser } = useGetUserQuery({ jwt })
@@ -157,6 +159,10 @@ function EditForm() {
       </Form>
     </div>
   )
+
+  if (!authStatus) {
+    return <Navigate to={'/sign-in'} />
+  }
 
   if (isGetUser || isUpdate) {
     return (

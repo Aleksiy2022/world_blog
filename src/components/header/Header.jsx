@@ -1,20 +1,19 @@
 import { Link, useNavigate } from 'react-router'
 import { Flex } from 'antd'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 
-import { selectAuth, setAuthorized, setUnauthorized } from '../profile_forms/authSlice.js'
+import { setAuthorized, setUnauthorized } from '../profile_forms/authSlice.js'
 
 import classes from './header.module.scss'
 import avatar from './image/avatar.jpg'
 
 // eslint-disable-next-line import/no-unresolved
-import { useGetUserQuery } from '@/redux/apiSlice.js'
+import apiSlice, { useGetUserQuery } from '@/redux/apiSlice.js'
 
-function Header() {
+function Header({ authStatus }) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const authStatus = useSelector(selectAuth)
   const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
   const { data: curUser } = useGetUserQuery({ jwt: jwtData?.authJwt })
 
@@ -28,6 +27,7 @@ function Header() {
     evt.preventDefault()
     localStorage.removeItem('blogAuthTokenData')
     dispatch(setUnauthorized())
+    dispatch(apiSlice.util.invalidateTags(['Article']))
     navigate('/')
   }
 
@@ -92,8 +92,8 @@ function Header() {
 
   return (
     <header className={classes['header']}>
-      <h1>
-        <Link className={`link-reset ${classes['header__title']}`} to={'/'}>
+      <h1 className={classes['header__title']}>
+        <Link className={`link-reset ${classes['header__title-link']}`} to={'/'}>
           Realworld Blog
         </Link>
       </h1>
