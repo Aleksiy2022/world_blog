@@ -1,28 +1,20 @@
 import { Link, useNavigate } from 'react-router'
 import { Flex } from 'antd'
 import { useDispatch } from 'react-redux'
-import { useEffect } from 'react'
 
-import { setAuthorized, setUnauthorized } from '../profile_forms/authSlice.js'
+import { setUnauthorized } from '../profile_forms/authSlice.js'
 
 import classes from './header.module.scss'
 import avatar from './image/avatar.jpg'
 
 // eslint-disable-next-line import/no-unresolved
-import apiSlice, { useGetUserQuery } from '@/redux/apiSlice.js'
+import apiSlice from '@/redux/apiSlice.js'
 
 function Header({ authStatus }) {
-  console.log(authStatus)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
-  const { data: curUser } = useGetUserQuery({ jwt: jwtData?.authJwt })
-
-  useEffect(() => {
-    if (jwtData && Date.now() < jwtData.expiresAt) {
-      dispatch(setAuthorized())
-    }
-  }, [dispatch, jwtData])
+  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState({ jwt: jwtData?.authJwt })
 
   function handleLogout(evt) {
     evt.preventDefault()
@@ -72,7 +64,7 @@ function Header({ authStatus }) {
   const userActionsPanel = (
     <div className={classes['header__actions-panel']}>
       <Link
-        to={'/'}
+        to={'/new-article'}
         className={`
             ${classes['header__link']}
             ${classes['header__link--article']}
