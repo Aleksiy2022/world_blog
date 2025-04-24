@@ -2,8 +2,6 @@
   width: 100%;
   max-width: 938px;
   background-color: #ffffff;
-  font-size: 18px;
-  line-height: 28px;
 }
 
 .article {
@@ -20,15 +18,16 @@
   }
 
   &__title {
+    display: flex;
+    align-items: center;
     margin: 0;
     height: 28px;
+    font-size: 20px;
   }
 
   &__link {
     display: block;
-    font-size: 20px;
     font-weight: 400;
-    height: 22px;
     color: #1890ff;
     overflow-y: hidden;
   }
@@ -44,7 +43,6 @@
     &:hover {
       cursor: pointer;
     }
-
   }
 
   &__favorite-count {
