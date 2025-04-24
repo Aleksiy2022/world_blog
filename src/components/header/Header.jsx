@@ -12,6 +12,7 @@ import avatar from './image/avatar.jpg'
 import apiSlice, { useGetUserQuery } from '@/redux/apiSlice.js'
 
 function Header({ authStatus }) {
+  console.log(authStatus)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
