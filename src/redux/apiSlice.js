@@ -58,7 +58,7 @@ const blogApiSlice = createApi({
           Authorization: `Bearer ${jwt}`,
         },
       }),
-      invalidatesTags: ['User'],
+      invalidatesTags: ['User', 'Article'],
     }),
     favoriteArticle: builder.mutation({
       query: ({ slug, jwt }) => ({
@@ -97,10 +97,21 @@ const blogApiSlice = createApi({
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${jwt}`,
-        }
+        },
       }),
       invalidatesTags: ['Article'],
-    })
+    }),
+    updateArticle: builder.mutation({
+      query: ({ updatedArticle, slug, jwt }) => ({
+        url: `/articles/${slug}`,
+        method: 'PUT',
+        body: updatedArticle,
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }),
+      invalidatesTags: ['Article'],
+    }),
   }),
 })
 
@@ -116,4 +127,5 @@ export const {
   useUnFavoriteArticleMutation,
   useCreateArticleMutation,
   useDeleteArticleMutation,
+  useUpdateArticleMutation,
 } = blogApiSlice
