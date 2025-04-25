@@ -164,9 +164,8 @@ function EditForm() {
         {content}
       </Spin>
     )
-  } else {
-    return <>{content}</>
   }
+  return <>{content}</>
 }
 
 export default EditForm
