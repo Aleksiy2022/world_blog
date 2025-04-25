@@ -9,7 +9,7 @@ import { useGetUserQuery, useUpdateUserMutation } from '@/redux/apiSlice.js'
 
 function EditForm() {
   const [updateUser, { isLoading: isUpdate, isError, error }] = useUpdateUserMutation()
-  const jwt = JSON.parse(localStorage.getItem('blogAuthToken'))
+  const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData')).authJwt
   const { data, isLoading: isGetUser } = useGetUserQuery({ jwt })
 
   const {
