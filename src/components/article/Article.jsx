@@ -1,20 +1,21 @@
 import { Link, useParams, useNavigate } from 'react-router'
 import Markdown from 'react-markdown'
 import { format } from 'date-fns'
-import { Alert, Tag, Button, Flex } from 'antd'
+import { Alert, Tag, Button, Flex, ConfigProvider, Popconfirm } from 'antd'
 import { useSelector } from 'react-redux'
 
 import { selectAuth } from '../profile_forms/authSlice.js'
 import SpinLoading from '../spin_loading/SpinLoading.jsx'
 
+import { editBtn, deleteBtn } from './antTheme.js'
 import classes from './article.module.scss'
 import unFavoriteImage from './image/unfavorite.svg'
 import favoriteImage from './image/favorite.svg'
 
 // eslint-disable-next-line import/no-unresolved
-import { useGetArticleBySlugQuery, useFavoriteArticleMutation, useUnFavoriteArticleMutation } from '@/redux/apiSlice.js'
+import apiSlice, { useGetArticleBySlugQuery, useFavoriteArticleMutation, useUnFavoriteArticleMutation, useDeleteArticleMutation } from '@/redux/apiSlice.js'
 
-function Article({ authStatus }) {
+function Article() {
   const params = useParams()
   const slug = params.slug
   const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
@@ -39,18 +40,12 @@ function Article({ authStatus }) {
   if (data) {
     const { body } = data.article
     content = (
-      <>
-        <Flex gap={12}>
-          <Button variant='outlined' color='danger'>Delete</Button>
-          <Button variant='outlined' color='primary'></Button>
-        </Flex>
-        <article className={classes['article-wrapper']}>
-          <ArticleInfo article={data.article} />
-          <div className={classes['article__content']}>
-            <Markdown>{body}</Markdown>
-          </div>
-        </article>
-      </>
+      <article className={classes['article-wrapper']}>
+        <ArticleInfo article={data.article} />
+        <div className={classes['article__content']}>
+          <Markdown>{body}</Markdown>
+        </div>
+      </article>
     )
   }
   return <>{content}</>
@@ -61,6 +56,9 @@ function ArticleInfo({ article }) {
   const navigate = useNavigate()
   const [favoriteArticle] = useFavoriteArticleMutation()
   const [unFavoritedArticle] = useUnFavoriteArticleMutation()
+  const [deleteArticle] = useDeleteArticleMutation()
+  const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
+  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState({ jwt: jwtData?.authJwt })
   const { title, slug, favorited, favoritesCount, tagList, description, author, createdAt, updatedAt } = article
   const articleDate = format(new Date(updatedAt ? updatedAt : createdAt), 'MMMM d, yyyy')
 
@@ -73,7 +71,6 @@ function ArticleInfo({ article }) {
   })
 
   function handleFavorite() {
-    const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
     if (authStatus && !favorited) {
       favoriteArticle({ slug, jwt: jwtData.authJwt })
     }
@@ -84,6 +81,35 @@ function ArticleInfo({ article }) {
       navigate('/sign-in')
     }
   }
+
+  function handleDeleteArticle() {
+    deleteArticle({ slug, jwt: jwtData.authJwt })
+    navigate('/')
+  }
+
+  function handleEditeArticle() {
+    console.log('Edit article')
+  }
+
+  const buttons = (
+      <Flex gap={12} rootClassName={classes['article__buttons']}>
+        <ConfigProvider theme={deleteBtn}>
+          <Popconfirm
+            title=''
+            description="Are you sure to delete this article?"
+            onConfirm={handleDeleteArticle}
+            okText='Yes'
+            cancelText='No'
+            placement='rightTop'
+          >
+            <Button variant='outlined' color='primary' >Delete</Button>
+          </Popconfirm>
+        </ConfigProvider>
+        <ConfigProvider theme={editBtn}>
+          <Button variant='outlined' color='primary' onClick={handleEditeArticle}>Edit</Button>
+        </ConfigProvider>
+      </Flex>
+  )
 
   return (
     <div className={classes['article']}>
@@ -113,6 +139,7 @@ function ArticleInfo({ article }) {
         </div>
         <img src={author.image} alt="Аватар" className={classes['author__image']} />
       </div>
+      {authStatus && author.username === curUser.user.username ? buttons : null}
     </div>
   )
 }

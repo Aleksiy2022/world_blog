@@ -26,9 +26,6 @@ const blogApiSlice = createApi({
         url: '/users',
         method: 'POST',
         body: userData,
-        headers: {
-          'Content-Type': 'application/json',
-        },
       }),
     }),
     login: builder.mutation({
@@ -37,7 +34,6 @@ const blogApiSlice = createApi({
         method: 'POST',
         body: loginData,
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${jwt}`,
         },
       }),
@@ -59,7 +55,6 @@ const blogApiSlice = createApi({
         method: 'PUT',
         body: { user: userData },
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${jwt}`,
         },
       }),
@@ -70,7 +65,6 @@ const blogApiSlice = createApi({
         url: `/articles/${slug}/favorite`,
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${jwt}`,
         },
       }),
@@ -81,7 +75,6 @@ const blogApiSlice = createApi({
         url: `/articles/${slug}/favorite`,
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${jwt}`,
         },
       }),
@@ -93,10 +86,20 @@ const blogApiSlice = createApi({
         method: 'POST',
         body: newArticle,
         headers: {
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwt}`,
+        },
+      }),
+      invalidatesTags: ['Article'],
+    }),
+    deleteArticle: builder.mutation({
+      query: ({ slug, jwt }) => ({
+        url: `/articles/${slug}`,
+        method: 'DELETE',
+        headers: {
           Authorization: `Bearer ${jwt}`,
         }
-      })
+      }),
+      invalidatesTags: ['Article'],
     })
   }),
 })
@@ -112,4 +115,5 @@ export const {
   useFavoriteArticleMutation,
   useUnFavoriteArticleMutation,
   useCreateArticleMutation,
+  useDeleteArticleMutation,
 } = blogApiSlice
