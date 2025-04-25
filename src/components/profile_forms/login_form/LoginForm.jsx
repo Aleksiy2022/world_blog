@@ -38,8 +38,7 @@ function LoginForm() {
 
   const onSubmit = async (formData) => {
     const loginData = { user: { ...formData } }
-    const regJwt = JSON.parse(localStorage.getItem('blogRegisterData')).token
-    const response = await login({ loginData, regJwt })
+    const response = await login({ loginData })
     const userData = response.data?.user
 
     if (userData) {
@@ -90,7 +89,6 @@ function LoginForm() {
         <Link to="/sign-up" className={classes['form__link']}>
           Sign Un
         </Link>
-        .
       </span>
     </div>
   )

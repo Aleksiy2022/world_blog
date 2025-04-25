@@ -1,15 +1,19 @@
-import { Button, Checkbox, Form, Input } from 'antd'
+import { Button, Checkbox, Form, Input, Spin } from 'antd'
 import { Link, useNavigate } from 'react-router'
 import { Controller, useForm } from 'react-hook-form'
 import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
 import classes from '../profile-form.module.scss'
+import { getJwtExpiration } from '../utils.js'
+import { setAuthorized } from '../authSlice.js'
 
 // eslint-disable-next-line import/no-unresolved
 import { useCreateNewUserMutation } from '@/redux/apiSlice.js'
 
 function RegisterForm() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const {
     handleSubmit,
@@ -26,7 +30,7 @@ function RegisterForm() {
     },
   })
 
-  const [createNewUser, { isError, error }] = useCreateNewUserMutation()
+  const [createNewUser, { isLoading: isCreateUset, isError, error }] = useCreateNewUserMutation()
 
   useEffect(() => {
     if (error?.data.errors.username) {
@@ -46,15 +50,18 @@ function RegisterForm() {
       },
     }
     const response = await createNewUser({ userData })
-    if (response?.data) {
-      const jwt = response.data.user.token
-      const email = response.data.user.email
-      localStorage.setItem('blogRegisterData', JSON.stringify({ token: jwt, email: email }))
-      navigate('/sign-in')
+    const newUser = response.data?.user
+
+    if (userData) {
+      const authJwt = newUser.token
+      const expiresAt = getJwtExpiration(authJwt)
+      localStorage.setItem('blogAuthTokenData', JSON.stringify({ authJwt: authJwt, expiresAt: expiresAt }))
+      dispatch(setAuthorized())
+      navigate('/')
     }
   }
 
-  return (
+  const registerContent = (
     <div className={classes['form']}>
       <h4 className={classes['form__title']}>Create new account</h4>
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
@@ -168,6 +175,15 @@ function RegisterForm() {
       </span>
     </div>
   )
+
+  if (isCreateUset) {
+    return (
+      <Spin tip="Loading..." size="large">
+        {registerContent}
+      </Spin>
+    )
+  }
+  return <>{registerContent}</>
 }
 
 export default RegisterForm

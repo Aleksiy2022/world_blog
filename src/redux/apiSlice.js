@@ -29,13 +29,10 @@ const blogApiSlice = createApi({
       }),
     }),
     login: builder.mutation({
-      query: ({ loginData, jwt }) => ({
+      query: ({ loginData }) => ({
         url: '/users/login',
         method: 'POST',
         body: loginData,
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
       }),
     }),
     getUser: builder.query({
