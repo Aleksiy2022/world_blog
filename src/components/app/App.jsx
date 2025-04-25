@@ -37,6 +37,14 @@ function App() {
   ) : (
     <main className={classes['main']}>
       <Routes>
+        <Route
+          path="/articles/:slug/edit"
+          element={
+            <PrivateRoute authStatus={authStatus}>
+              <ArticleEditCreateForm />
+            </PrivateRoute>
+          }
+        ></Route>
         <Route path="/articles/:slug" element={<Article />}></Route>
         <Route path="/sign-up" element={<RegisterForm />}></Route>
         <Route path="/sign-in" element={<LoginForm />}></Route>

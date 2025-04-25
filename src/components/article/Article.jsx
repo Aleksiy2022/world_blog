@@ -12,8 +12,13 @@ import classes from './article.module.scss'
 import unFavoriteImage from './image/unfavorite.svg'
 import favoriteImage from './image/favorite.svg'
 
-// eslint-disable-next-line import/no-unresolved
-import apiSlice, { useGetArticleBySlugQuery, useFavoriteArticleMutation, useUnFavoriteArticleMutation, useDeleteArticleMutation } from '@/redux/apiSlice.js'
+import apiSlice, {
+  useGetArticleBySlugQuery,
+  useFavoriteArticleMutation,
+  useUnFavoriteArticleMutation,
+  useDeleteArticleMutation,
+  // eslint-disable-next-line import/no-unresolved
+} from '@/redux/apiSlice.js'
 
 function Article() {
   const params = useParams()
@@ -39,9 +44,10 @@ function Article() {
   let content = null
   if (data) {
     const { body } = data.article
+    const article = { ...data.article, fullArticle: true }
     content = (
       <article className={classes['article-wrapper']}>
-        <ArticleInfo article={data.article} />
+        <ArticleInfo article={article} />
         <div className={classes['article__content']}>
           <Markdown>{body}</Markdown>
         </div>
@@ -59,7 +65,8 @@ function ArticleInfo({ article }) {
   const [deleteArticle] = useDeleteArticleMutation()
   const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
   const { data: curUser } = apiSlice.endpoints.getUser.useQueryState({ jwt: jwtData?.authJwt })
-  const { title, slug, favorited, favoritesCount, tagList, description, author, createdAt, updatedAt } = article
+  const { fullArticle, title, slug, favorited, favoritesCount, tagList, description, author, createdAt, updatedAt } =
+    article
   const articleDate = format(new Date(updatedAt ? updatedAt : createdAt), 'MMMM d, yyyy')
 
   const tagsToView = tagList.map((tag, index) => {
@@ -88,27 +95,31 @@ function ArticleInfo({ article }) {
   }
 
   function handleEditeArticle() {
-    console.log('Edit article')
+    navigate(`/articles/${slug}/edit`)
   }
 
   const buttons = (
-      <Flex gap={12} rootClassName={classes['article__buttons']}>
-        <ConfigProvider theme={deleteBtn}>
-          <Popconfirm
-            title=''
-            description="Are you sure to delete this article?"
-            onConfirm={handleDeleteArticle}
-            okText='Yes'
-            cancelText='No'
-            placement='rightTop'
-          >
-            <Button variant='outlined' color='primary' >Delete</Button>
-          </Popconfirm>
-        </ConfigProvider>
-        <ConfigProvider theme={editBtn}>
-          <Button variant='outlined' color='primary' onClick={handleEditeArticle}>Edit</Button>
-        </ConfigProvider>
-      </Flex>
+    <Flex gap={12} rootClassName={classes['article__buttons']}>
+      <ConfigProvider theme={deleteBtn}>
+        <Popconfirm
+          title=""
+          description="Are you sure to delete this article?"
+          onConfirm={handleDeleteArticle}
+          okText="Yes"
+          cancelText="No"
+          placement="rightTop"
+        >
+          <Button variant="outlined" color="primary">
+            Delete
+          </Button>
+        </Popconfirm>
+      </ConfigProvider>
+      <ConfigProvider theme={editBtn}>
+        <Button variant="outlined" color="primary" onClick={handleEditeArticle}>
+          Edit
+        </Button>
+      </ConfigProvider>
+    </Flex>
   )
 
   return (
@@ -139,7 +150,7 @@ function ArticleInfo({ article }) {
         </div>
         <img src={author.image} alt="Аватар" className={classes['author__image']} />
       </div>
-      {authStatus && author.username === curUser.user.username ? buttons : null}
+      {fullArticle && authStatus && author.username === curUser.user.username ? buttons : null}
     </div>
   )
 }

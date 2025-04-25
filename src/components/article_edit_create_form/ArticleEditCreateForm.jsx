@@ -1,17 +1,23 @@
 import { Input, Form, Typography, Button, Flex, Row, Col, ConfigProvider } from 'antd'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 
 import classes from './article-edit-create-form.module.scss'
 import { theme } from './antdTheme.js'
 
 // eslint-disable-next-line import/no-unresolved
-import { useCreateArticleMutation } from '@/redux/apiSlice.js'
+import { useCreateArticleMutation, useGetArticleBySlugQuery, useUpdateArticleMutation } from '@/redux/apiSlice.js'
 
 function ArticleEditCreateForm() {
   const navigate = useNavigate()
   const [createArticle] = useCreateArticleMutation()
+  const [updateArticle] = useUpdateArticleMutation()
   const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData')).authJwt
+
+  const params = useParams()
+  const slug = params.slug
+  const { data } = useGetArticleBySlugQuery({ slug, jwt })
+  const tagsToEdit = data?.article.tagList.map((item) => ({ tag: item }))
 
   const {
     handleSubmit,
@@ -19,10 +25,10 @@ function ArticleEditCreateForm() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      title: undefined,
-      body: undefined,
-      description: undefined,
-      tagList: [{ tag: '' }],
+      title: data ? data.article.title : undefined,
+      body: data ? data.article.body : undefined,
+      description: data ? data.article.description : undefined,
+      tagList: data ? tagsToEdit : [{ tag: '' }],
     },
   })
 
@@ -34,17 +40,22 @@ function ArticleEditCreateForm() {
   const onSubmit = (data) => {
     const tagList = data.tagList.map((item) => item.tag)
     const newArticle = {
-      article: {...data, tagList: tagList},
+      article: { ...data, tagList: tagList },
     }
-    createArticle({ newArticle, jwt })
-    navigate('/')
+    if (!slug) {
+      createArticle({ newArticle, jwt })
+      navigate('/')
+    } else {
+      updateArticle({ updatedArticle: newArticle, slug, jwt })
+      navigate(`/articles/${slug}`)
+    }
   }
 
   return (
     <ConfigProvider theme={theme}>
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)} className={classes['form__wrapper']}>
         <Typography.Title level={4} className={classes['form__title']}>
-          Create new Article
+          {slug ? 'Edit article' : 'Create new Article'}
         </Typography.Title>
         <Form.Item
           label="Title"
@@ -79,14 +90,20 @@ function ArticleEditCreateForm() {
             name="body"
             control={control}
             rules={{ required: 'Text is required' }}
-            render={({ field }) => <Input.TextArea styles={{
-              textarea: { height: '168px' },
-            }} {...field} placeholder="Text" />}
+            render={({ field }) => (
+              <Input.TextArea
+                styles={{
+                  textarea: { height: '168px' },
+                }}
+                {...field}
+                placeholder="Text"
+              />
+            )}
           />
         </Form.Item>
         <Row align="bottom" gutter={[17, 0]}>
-          <Col flex span={12} >
-            <Form.Item label="Tags" >
+          <Col flex span={12}>
+            <Form.Item label="Tags">
               {fields.map((item, index) => (
                 <Flex key={item.id} className={classes['form__tag_wrapper']}>
                   <Controller
@@ -97,7 +114,12 @@ function ArticleEditCreateForm() {
                       <Input {...field} placeholder="Tag" status={fieldState.error ? 'error' : ''} />
                     )}
                   />
-                  <Button className={classes['form__delete-btn']} onClick={() => remove(index)} variant="outlined" danger>
+                  <Button
+                    className={classes['form__delete-btn']}
+                    onClick={() => remove(index)}
+                    variant="outlined"
+                    danger
+                  >
                     Delete
                   </Button>
                 </Flex>
@@ -106,7 +128,12 @@ function ArticleEditCreateForm() {
           </Col>
           <Col span={12}>
             <Form.Item>
-              <Button variant="outlined" onClick={() => append({ tag: '' })} className={classes['form__add-btn']} color='primary'>
+              <Button
+                variant="outlined"
+                onClick={() => append({ tag: '' })}
+                className={classes['form__add-btn']}
+                color="primary"
+              >
                 Add tag
               </Button>
             </Form.Item>
