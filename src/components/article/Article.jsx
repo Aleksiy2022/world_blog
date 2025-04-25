@@ -1,7 +1,7 @@
 import { Link, useParams, useNavigate } from 'react-router'
 import Markdown from 'react-markdown'
 import { format } from 'date-fns'
-import { Alert, Tag } from 'antd'
+import { Alert, Tag, Button, Flex } from 'antd'
 import { useSelector } from 'react-redux'
 
 import { selectAuth } from '../profile_forms/authSlice.js'
@@ -14,7 +14,7 @@ import favoriteImage from './image/favorite.svg'
 // eslint-disable-next-line import/no-unresolved
 import { useGetArticleBySlugQuery, useFavoriteArticleMutation, useUnFavoriteArticleMutation } from '@/redux/apiSlice.js'
 
-function Article() {
+function Article({ authStatus }) {
   const params = useParams()
   const slug = params.slug
   const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
@@ -39,12 +39,18 @@ function Article() {
   if (data) {
     const { body } = data.article
     content = (
-      <article className={classes['article-wrapper']}>
-        <ArticleInfo article={data.article} />
-        <div className={classes['article__content']}>
-          <Markdown>{body}</Markdown>
-        </div>
-      </article>
+      <>
+        <Flex gap={12}>
+          <Button variant='outlined' color='danger'>Delete</Button>
+          <Button variant='outlined' color='primary'></Button>
+        </Flex>
+        <article className={classes['article-wrapper']}>
+          <ArticleInfo article={data.article} />
+          <div className={classes['article__content']}>
+            <Markdown>{body}</Markdown>
+          </div>
+        </article>
+      </>
     )
   }
   return <>{content}</>
