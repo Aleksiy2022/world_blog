@@ -4,7 +4,14 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import classes from './article-edit-create-form.module.scss'
 import { theme } from './antdTheme.js'
 
+// eslint-disable-next-line import/no-unresolved
+import { useCreateArticleMutation } from '@/redux/apiSlice.js'
+
 function ArticleEditCreateForm() {
+  const [createArticle, { data, isLoading }] = useCreateArticleMutation()
+  console.log(data)
+  const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData')).authJwt
+
   const {
     handleSubmit,
     control,
@@ -24,7 +31,11 @@ function ArticleEditCreateForm() {
   })
 
   const onSubmit = (data) => {
-    console.log(data)
+    const tags = data.tags.map((item) => item.tag)
+    const newArticle = {
+      article: {...data, tags: tags},
+    }
+    createArticle({ newArticle, jwt })
   }
 
   return (

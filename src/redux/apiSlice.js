@@ -87,6 +87,17 @@ const blogApiSlice = createApi({
       }),
       invalidatesTags: ['Article'],
     }),
+    createArticle: builder.mutation({
+      query: ({ newArticle, jwt }) => ({
+        url: '/articles',
+        method: 'POST',
+        body: newArticle,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwt}`,
+        }
+      })
+    })
   }),
 })
 
@@ -100,4 +111,5 @@ export const {
   useUpdateUserMutation,
   useFavoriteArticleMutation,
   useUnFavoriteArticleMutation,
+  useCreateArticleMutation,
 } = blogApiSlice
