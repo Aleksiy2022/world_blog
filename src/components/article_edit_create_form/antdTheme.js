@@ -11,7 +11,7 @@ const theme = {
     Form: {
       itemMarginBottom: 21,
     },
-  }
+  },
 }
 
 export { theme }
