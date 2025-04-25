@@ -37,7 +37,7 @@ function App() {
   ) : (
     <main className={classes['main']}>
       <Routes>
-        <Route path="/articles/:slug" element={<Article authStatus={authStatus} />}></Route>
+        <Route path="/articles/:slug" element={<Article />}></Route>
         <Route path="/sign-up" element={<RegisterForm />}></Route>
         <Route path="/sign-in" element={<LoginForm />}></Route>
         <Route
