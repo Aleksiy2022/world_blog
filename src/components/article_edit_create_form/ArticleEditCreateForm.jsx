@@ -1,5 +1,6 @@
 import { Input, Form, Typography, Button, Flex, Row, Col, ConfigProvider } from 'antd'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
+import { useNavigate } from 'react-router'
 
 import classes from './article-edit-create-form.module.scss'
 import { theme } from './antdTheme.js'
@@ -8,8 +9,8 @@ import { theme } from './antdTheme.js'
 import { useCreateArticleMutation } from '@/redux/apiSlice.js'
 
 function ArticleEditCreateForm() {
-  const [createArticle, { data, isLoading }] = useCreateArticleMutation()
-  console.log(data)
+  const navigate = useNavigate()
+  const [createArticle] = useCreateArticleMutation()
   const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData')).authJwt
 
   const {
@@ -21,21 +22,22 @@ function ArticleEditCreateForm() {
       title: undefined,
       body: undefined,
       description: undefined,
-      tags: [{ tag: '' }],
+      tagList: [{ tag: '' }],
     },
   })
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'tags',
+    name: 'tagList',
   })
 
   const onSubmit = (data) => {
-    const tags = data.tags.map((item) => item.tag)
+    const tagList = data.tagList.map((item) => item.tag)
     const newArticle = {
-      article: {...data, tags: tags},
+      article: {...data, tagList: tagList},
     }
     createArticle({ newArticle, jwt })
+    navigate('/')
   }
 
   return (
@@ -88,7 +90,7 @@ function ArticleEditCreateForm() {
               {fields.map((item, index) => (
                 <Flex key={item.id} className={classes['form__tag_wrapper']}>
                   <Controller
-                    name={`tags.${index}.tag`}
+                    name={`tagList.${index}.tag`}
                     control={control}
                     rules={{ required: 'Tag is required' }}
                     render={({ field, fieldState }) => (
