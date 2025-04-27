@@ -2,21 +2,18 @@ import { Input, Form, Typography, Button, Flex, Row, Col, ConfigProvider } from 
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router'
 
+import { useCreateArticleMutation, useGetArticleBySlugQuery, useUpdateArticleMutation } from '@/redux/apiSlice.js'
+
 import classes from './article-edit-create-form.module.scss'
 import { theme } from './antdTheme.js'
-
-// eslint-disable-next-line import/no-unresolved
-import { useCreateArticleMutation, useGetArticleBySlugQuery, useUpdateArticleMutation } from '@/redux/apiSlice.js'
 
 function ArticleEditCreateForm() {
   const navigate = useNavigate()
   const [createArticle] = useCreateArticleMutation()
   const [updateArticle] = useUpdateArticleMutation()
-  const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData')).authJwt
 
-  const params = useParams()
-  const slug = params.slug
-  const { data } = useGetArticleBySlugQuery({ slug, jwt })
+  const { slug } = useParams()
+  const { data } = useGetArticleBySlugQuery({ slug })
   const tagsToEdit = data?.article.tagList.map((item) => ({ tag: item }))
 
   const {
@@ -32,7 +29,11 @@ function ArticleEditCreateForm() {
     },
   })
 
-  const { fields, append, remove } = useFieldArray({
+  const {
+    fields,
+    append: addTag,
+    remove: deleteTag,
+  } = useFieldArray({
     control,
     name: 'tagList',
   })
@@ -43,10 +44,10 @@ function ArticleEditCreateForm() {
       article: { ...data, tagList: tagList },
     }
     if (!slug) {
-      createArticle({ newArticle, jwt })
+      createArticle({ newArticle })
       navigate('/')
     } else {
-      updateArticle({ updatedArticle: newArticle, slug, jwt })
+      updateArticle({ updatedArticle: newArticle, slug })
       navigate(`/articles/${slug}`)
     }
   }
@@ -116,7 +117,7 @@ function ArticleEditCreateForm() {
                   />
                   <Button
                     className={classes['form__delete-btn']}
-                    onClick={() => remove(index)}
+                    onClick={() => deleteTag(index)}
                     variant="outlined"
                     danger
                   >
@@ -130,7 +131,7 @@ function ArticleEditCreateForm() {
             <Form.Item>
               <Button
                 variant="outlined"
-                onClick={() => append({ tag: '' })}
+                onClick={() => addTag({ tag: '' })}
                 className={classes['form__add-btn']}
                 color="primary"
               >

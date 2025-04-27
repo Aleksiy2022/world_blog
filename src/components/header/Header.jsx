@@ -2,23 +2,23 @@ import { Link, useNavigate } from 'react-router'
 import { Flex } from 'antd'
 import { useDispatch } from 'react-redux'
 
+import apiSlice from '@/redux/apiSlice.js'
+
 import { setUnauthorized } from '../profile_forms/authSlice.js'
 
 import classes from './header.module.scss'
 import avatar from './image/avatar.jpg'
 
-// eslint-disable-next-line import/no-unresolved
-import apiSlice from '@/redux/apiSlice.js'
-
 function Header({ authStatus }) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
-  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState({ jwt: jwtData?.authJwt })
+  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState()
+  const username = curUser?.user?.username || ''
+  const userImage = curUser?.user?.image || avatar
 
   function handleLogout(evt) {
     evt.preventDefault()
-    localStorage.removeItem('blogAuthTokenData')
+    localStorage.setItem('blogAuthTokenData', JSON.stringify({ jwt: '', expiresAt: '', email: curUser.user.email }))
     dispatch(setUnauthorized())
     dispatch(apiSlice.util.invalidateTags(['Article']))
     navigate('/')
@@ -73,12 +73,8 @@ function Header({ authStatus }) {
         Create article
       </Link>
       <Link to={'/profile'} className={classes['header__profile-link']}>
-        <span>{curUser ? curUser.user.username : null}</span>
-        <img
-          className={classes['header__profile-img']}
-          src={curUser ? (curUser.user.image ? curUser.user.image : avatar) : null}
-          alt="аватар"
-        />
+        <span>{username}</span>
+        <img className={classes['header__profile-img']} src={userImage} alt="аватар" />
       </Link>
     </div>
   )
@@ -91,8 +87,17 @@ function Header({ authStatus }) {
         </Link>
       </h1>
       <Flex>
-        {authStatus ? userActionsPanel : signIn}
-        {authStatus ? logOut : signUp}
+        {authStatus ? (
+          <>
+            {userActionsPanel}
+            {logOut}
+          </>
+        ) : (
+          <>
+            {signIn}
+            {signUp}
+          </>
+        )}
       </Flex>
     </header>
   )

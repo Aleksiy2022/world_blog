@@ -1,23 +1,20 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { Pagination, Alert } from 'antd'
+import { Pagination, Alert, Skeleton } from 'antd'
+
+import { useGetArticlesQuery, useGetUserQuery } from '@/redux/apiSlice.js'
 
 import { ArticleInfo } from '../article/Article.jsx'
-import SpinLoading from '../spin_loading/SpinLoading.jsx'
 
 import { selectPage, setPage } from './articlesPageSlice.js'
 import classes from './article-list.module.scss'
-
-// eslint-disable-next-line import/no-unresolved
-import { useGetArticlesQuery } from '@/redux/apiSlice.js'
 
 function ArticleList() {
   const dispatch = useDispatch()
   const curPage = useSelector(selectPage)
   const offset = (curPage - 1) * 5
-  const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
+  const { data, isLoading, isError } = useGetArticlesQuery({ limit: 5, offset })
+  useGetUserQuery()
 
-  const { data: articlesData, isLoading, isError } = useGetArticlesQuery({ limit: 5, offset, jwt: jwtData?.authJwt })
-  let articlesToView = null
   if (isError) {
     return (
       <Alert
@@ -29,35 +26,27 @@ function ArticleList() {
     )
   }
 
-  if (isLoading) {
-    return <SpinLoading />
-  }
+  if (isLoading) return <Skeleton active />
 
-  if (articlesData) {
-    articlesToView = articlesData.articles.map((article) => {
-      return (
-        <li key={article.slug}>
-          <ArticleInfo article={article} />
-        </li>
-      )
-    })
-  }
+  const articles = data?.articles || []
+  const total = data?.articlesCount || 0
 
-  function handleChangePage(page) {
+  const handleChangePage = (page) => {
     dispatch(setPage({ page }))
   }
 
   return (
     <>
-      <ul className={`list-reset ${classes['article-list']}`}>{articlesToView}</ul>
-      <Pagination
-        align="center"
-        current={curPage}
-        total={articlesData?.articlesCount ? articlesData.articlesCount : 0}
-        defaultPageSize={5}
-        onChange={handleChangePage}
-        showSizeChanger={false}
-      />
+      <ul className={`list-reset ${classes['article-list']}`}>
+        {articles.map((article) => (
+          <li key={article.slug}>
+            <ArticleInfo article={article} />
+          </li>
+        ))}
+      </ul>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+        <Pagination current={curPage} total={total} pageSize={5} onChange={handleChangePage} showSizeChanger={false} />
+      </div>
     </>
   )
 }

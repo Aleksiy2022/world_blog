@@ -1,45 +1,27 @@
 import { Link, useParams, useNavigate } from 'react-router'
 import Markdown from 'react-markdown'
 import { format } from 'date-fns'
-import { Alert, Tag, Button, Flex, ConfigProvider, Popconfirm } from 'antd'
+import { Alert, Tag, Button, Flex, ConfigProvider, Popconfirm, Skeleton } from 'antd'
 import { useSelector } from 'react-redux'
-
-import { selectAuth } from '../profile_forms/authSlice.js'
-import SpinLoading from '../spin_loading/SpinLoading.jsx'
-
-import { editBtn, deleteBtn } from './antTheme.js'
-import classes from './article.module.scss'
-import unFavoriteImage from './image/unfavorite.svg'
-import favoriteImage from './image/favorite.svg'
 
 import apiSlice, {
   useGetArticleBySlugQuery,
   useFavoriteArticleMutation,
   useUnFavoriteArticleMutation,
   useDeleteArticleMutation,
-  // eslint-disable-next-line import/no-unresolved
 } from '@/redux/apiSlice.js'
+
+import { selectAuth } from '../profile_forms/authSlice.js'
+
+import { editBtn, deleteBtn } from './antTheme.js'
+import classes from './article.module.scss'
+import unFavoriteImage from './image/unfavorite.svg'
+import favoriteImage from './image/favorite.svg'
 
 function Article() {
   const params = useParams()
   const slug = params.slug
-  const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
-  const { data, isLoading, isError } = useGetArticleBySlugQuery({ slug, jwt: jwtData?.authJwt })
-
-  if (isError) {
-    return (
-      <Alert
-        message="Error"
-        description="Не удалось загрузить статью. Пожалуйста, перезагрузите страницу или попробуйте еще раз позже."
-        type="error"
-        showIcon
-      />
-    )
-  }
-
-  if (isLoading) {
-    return <SpinLoading />
-  }
+  const { data, isLoading, isError } = useGetArticleBySlugQuery({ slug })
 
   let content = null
   if (data) {
@@ -54,6 +36,19 @@ function Article() {
       </article>
     )
   }
+
+  if (isError) {
+    return (
+      <Alert
+        message="Error"
+        description="Не удалось загрузить статью. Пожалуйста, перезагрузите страницу или попробуйте еще раз позже."
+        type="error"
+        showIcon
+      />
+    )
+  }
+
+  if (isLoading) return <Skeleton active />
   return <>{content}</>
 }
 
@@ -61,10 +56,9 @@ function ArticleInfo({ article }) {
   const authStatus = useSelector(selectAuth)
   const navigate = useNavigate()
   const [favoriteArticle] = useFavoriteArticleMutation()
-  const [unFavoritedArticle] = useUnFavoriteArticleMutation()
+  const [unFavoriteArticle] = useUnFavoriteArticleMutation()
   const [deleteArticle] = useDeleteArticleMutation()
-  const jwtData = JSON.parse(localStorage.getItem('blogAuthTokenData'))
-  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState({ jwt: jwtData?.authJwt })
+  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState()
   const { fullArticle, title, slug, favorited, favoritesCount, tagList, description, author, createdAt, updatedAt } =
     article
   const articleDate = format(new Date(updatedAt ? updatedAt : createdAt), 'MMMM d, yyyy')
@@ -79,10 +73,10 @@ function ArticleInfo({ article }) {
 
   function handleFavorite() {
     if (authStatus && !favorited) {
-      favoriteArticle({ slug, jwt: jwtData.authJwt })
+      favoriteArticle({ slug })
     }
     if (authStatus && favorited) {
-      unFavoritedArticle({ slug, jwt: jwtData.authJwt })
+      unFavoriteArticle({ slug })
     }
     if (!authStatus) {
       navigate('/sign-in')
@@ -90,11 +84,11 @@ function ArticleInfo({ article }) {
   }
 
   function handleDeleteArticle() {
-    deleteArticle({ slug, jwt: jwtData.authJwt })
+    deleteArticle({ slug })
     navigate('/')
   }
 
-  function handleEditeArticle() {
+  function handleEditArticle() {
     navigate(`/articles/${slug}/edit`)
   }
 
@@ -115,12 +109,14 @@ function ArticleInfo({ article }) {
         </Popconfirm>
       </ConfigProvider>
       <ConfigProvider theme={editBtn}>
-        <Button variant="outlined" color="primary" onClick={handleEditeArticle}>
+        <Button variant="outlined" color="primary" onClick={handleEditArticle}>
           Edit
         </Button>
       </ConfigProvider>
     </Flex>
   )
+
+  const showButtons = fullArticle && authStatus && author.username === curUser.user.username
 
   return (
     <div className={classes['article']}>
@@ -150,7 +146,7 @@ function ArticleInfo({ article }) {
         </div>
         <img src={author.image} alt="Аватар" className={classes['author__image']} />
       </div>
-      {fullArticle && authStatus && author.username === curUser.user.username ? buttons : null}
+      {showButtons ? buttons : null}
     </div>
   )
 }
