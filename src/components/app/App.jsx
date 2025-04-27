@@ -13,7 +13,6 @@ import RegisterForm from '../profile_forms/register_form/RegisterForm.jsx'
 import LoginForm from '../profile_forms/login_form/LoginForm.jsx'
 import EditProfileForm from '../profile_forms/edit_profile_form/EditProfileForm.jsx'
 import PrivateRoute from '../privet_route/PrivetRoute.jsx'
-import UserForm from '../profile_forms/UserForm.jsx'
 import { selectAuth, setAuthorized } from '../profile_forms/authSlice.js'
 
 import classes from './app.module.scss'
@@ -32,7 +31,6 @@ function App() {
   }, [isSuccess])
   const privateRoutes = [
     { path: '/articles/:slug/edit', element: <ArticleEditCreateForm /> },
-    // { path: '/profile', element: <UserForm edit={true} /> },
     { path: '/profile', element: <EditProfileForm /> },
     { path: '/new-article', element: <ArticleEditCreateForm /> }
   ]
@@ -43,8 +41,6 @@ function App() {
       <main className={classes['main']}>
         <Routes>
           <Route path="/articles/:slug" element={<Article />}></Route>
-          {/*<Route path="/sign-up" element={<UserForm register={true} />}></Route>*/}
-          {/*<Route path="/sign-in" element={<UserForm login={true} />}></Route>*/}
           <Route path="/sign-up" element={<RegisterForm />}></Route>
           <Route path="/sign-in" element={<LoginForm />}></Route>
           <Route path="/" element={<ArticleList />}></Route>

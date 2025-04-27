@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router'
 import { Flex } from 'antd'
 import { useDispatch } from 'react-redux'
 
-import apiSlice from '@/redux/apiSlice.js'
+import apiSlice, { useGetUserQuery } from '@/redux/apiSlice.js'
 
 import { setUnauthorized } from '../profile_forms/authSlice.js'
 
@@ -12,7 +12,9 @@ import avatar from './image/avatar.jpg'
 function Header({ authStatus }) {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState()
+  const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.jwt
+
+  const { data: curUser } = useGetUserQuery(undefined, { skip: !jwt })
   const username = curUser?.user?.username || ''
   const userImage = curUser?.user?.image || avatar
 

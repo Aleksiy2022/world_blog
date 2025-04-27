@@ -6,15 +6,16 @@ import { useDispatch } from 'react-redux'
 
 import { useLoginMutation } from '@/redux/apiSlice.js'
 
-import { setAuthorized } from '../authSlice.js'
 import classes from '../profile-form.module.scss'
-import { getJwtExpiration } from '../utils.js'
+import { useLogin } from '../hooks.js'
 
 function LoginForm() {
   const dispatch = useDispatch()
   let navigate = useNavigate()
 
-  const [login, { isError, error }] = useLoginMutation()
+  const [login, {data, isError, error }] = useLoginMutation()
+  useLogin({ user: data, dispatch, navigate})
+
   const email = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.email
   const {
     handleSubmit,
@@ -36,16 +37,7 @@ function LoginForm() {
   }, [isError])
 
   const onSubmit = async (formData) => {
-    const response = await login({ formData })
-    const userData = response.data?.user
-
-    if (userData) {
-      const jwt = userData.token
-      const expiresAt = getJwtExpiration(jwt)
-      localStorage.setItem('blogAuthTokenData', JSON.stringify({ jwt: jwt, expiresAt: expiresAt }))
-      dispatch(setAuthorized())
-      navigate('/')
-    }
+    await login({ formData })
   }
 
   return (
