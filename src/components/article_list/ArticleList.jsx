@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { Pagination, Alert, Skeleton } from 'antd'
 
-import { useGetArticlesQuery, useGetUserQuery } from '@/redux/apiSlice.js'
+import { useGetArticlesQuery } from '@/redux/apiSlice.js'
 
 import { ArticleInfo } from '../article/Article.jsx'
 
@@ -13,7 +13,6 @@ function ArticleList() {
   const curPage = useSelector(selectPage)
   const offset = (curPage - 1) * 5
   const { data, isLoading, isError } = useGetArticlesQuery({ limit: 5, offset })
-  useGetUserQuery()
 
   if (isError) {
     return (

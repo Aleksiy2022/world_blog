@@ -13,7 +13,7 @@ function ArticleEditCreateForm() {
   const [updateArticle] = useUpdateArticleMutation()
 
   const { slug } = useParams()
-  const { data } = useGetArticleBySlugQuery({ slug })
+  const { data } = useGetArticleBySlugQuery({ slug }, { skip: !slug })
   const tagsToEdit = data?.article.tagList.map((item) => ({ tag: item }))
 
   const {
@@ -38,16 +38,16 @@ function ArticleEditCreateForm() {
     name: 'tagList',
   })
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const tagList = data.tagList.map((item) => item.tag)
     const newArticle = {
       article: { ...data, tagList: tagList },
     }
     if (!slug) {
-      createArticle({ newArticle })
+      await createArticle({ newArticle })
       navigate('/')
     } else {
-      updateArticle({ updatedArticle: newArticle, slug })
+      await updateArticle({ updatedArticle: newArticle, slug })
       navigate(`/articles/${slug}`)
     }
   }

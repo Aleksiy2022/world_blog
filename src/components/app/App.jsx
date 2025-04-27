@@ -22,14 +22,14 @@ import { theme } from './antTheme.js'
 function App() {
   const dispatch = useDispatch()
   const authStatus = useSelector(selectAuth)
-  const { isSuccess } = useGetUserQuery()
+  const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.jwt
+  const { isSuccess } = useGetUserQuery(undefined, { skip: !jwt })
 
   useEffect(() => {
     if (isSuccess) {
       dispatch(setAuthorized())
     }
   }, [isSuccess])
-
   const privateRoutes = [
     { path: '/articles/:slug/edit', element: <ArticleEditCreateForm /> },
     // { path: '/profile', element: <UserForm edit={true} /> },
