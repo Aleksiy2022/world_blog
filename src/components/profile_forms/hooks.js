@@ -4,8 +4,6 @@ import { getJwtExpiration } from './utils.js'
 import { setAuthorized } from './authSlice.js'
 
 function useLogin({ user, dispatch, navigate, isRegister = false }, refetch) {
-  console.log('isRegister: ', isRegister)
-  console.log('user: ', user)
   useEffect(() => {
     if (user) {
       const jwt = user.user.token
