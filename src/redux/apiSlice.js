@@ -104,7 +104,6 @@ export const {
   useCreateNewUserMutation,
   useLoginMutation,
   useGetUserQuery,
-  useGetUserQuerySubscription,
   useUpdateUserMutation,
   useFavoriteArticleMutation,
   useUnFavoriteArticleMutation,
