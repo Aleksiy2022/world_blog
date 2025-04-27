@@ -1,18 +1,15 @@
-import { Link, useParams, useNavigate } from 'react-router'
+import { Link, useParams } from 'react-router'
 import Markdown from 'react-markdown'
 import { format } from 'date-fns'
 import { Alert, Tag, Button, Flex, ConfigProvider, Popconfirm, Skeleton } from 'antd'
 import { useSelector } from 'react-redux'
+import { memo, useMemo } from 'react'
 
-import apiSlice, {
-  useGetArticleBySlugQuery,
-  useFavoriteArticleMutation,
-  useUnFavoriteArticleMutation,
-  useDeleteArticleMutation,
-} from '@/redux/apiSlice.js'
+import { useGetArticleBySlugQuery, } from '@/redux/apiSlice.js'
 
 import { selectAuth } from '../profile_forms/authSlice.js'
 
+import { useArticleActions } from './hooks.js'
 import { editBtn, deleteBtn } from './antTheme.js'
 import classes from './article.module.scss'
 import unFavoriteImage from './image/unfavorite.svg'
@@ -23,11 +20,11 @@ function Article() {
   const slug = params.slug
   const { data, isLoading, isError } = useGetArticleBySlugQuery({ slug })
 
-  let content = null
-  if (data) {
+  const content = useMemo(() => {
+    if (!data) return null
     const { body } = data.article
     const article = { ...data.article, fullArticle: true }
-    content = (
+    return (
       <article className={classes['article-wrapper']}>
         <ArticleInfo article={article} />
         <div className={classes['article__content']}>
@@ -35,7 +32,7 @@ function Article() {
         </div>
       </article>
     )
-  }
+  }, [data])
 
   if (isError) {
     return (
@@ -52,45 +49,22 @@ function Article() {
   return <>{content}</>
 }
 
-function ArticleInfo({ article }) {
+const ArticleInfo = memo(function ArticleInfo({ article }) {
   const authStatus = useSelector(selectAuth)
-  const navigate = useNavigate()
-  const [favoriteArticle] = useFavoriteArticleMutation()
-  const [unFavoriteArticle] = useUnFavoriteArticleMutation()
-  const [deleteArticle] = useDeleteArticleMutation()
-  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState()
   const { fullArticle, title, slug, favorited, favoritesCount, tagList, description, author, createdAt, updatedAt } =
     article
   const articleDate = format(new Date(updatedAt ? updatedAt : createdAt), 'MMMM d, yyyy')
+  const { handleFavorite, handleDeleteArticle, handleEditArticle, username } = useArticleActions(slug, favorited)
+  const showButtons = fullArticle && authStatus && author.username === username
 
-  const tagsToView = tagList.map((tag, index) => {
-    return (
-      <li key={index}>
-        <Tag rootClassName={classes['article__tag']}>{tag}</Tag>
-      </li>
-    )
-  })
-
-  function handleFavorite() {
-    if (authStatus && !favorited) {
-      favoriteArticle({ slug })
-    }
-    if (authStatus && favorited) {
-      unFavoriteArticle({ slug })
-    }
-    if (!authStatus) {
-      navigate('/sign-in')
-    }
-  }
-
-  function handleDeleteArticle() {
-    deleteArticle({ slug })
-    navigate('/')
-  }
-
-  function handleEditArticle() {
-    navigate(`/articles/${slug}/edit`)
-  }
+  const tagsToView = useMemo(() =>
+      tagList.map((tag, index) => (
+        <li key={index}>
+          <Tag rootClassName={classes['article__tag']}>{tag}</Tag>
+        </li>
+      )),
+    [tagList, classes]
+  )
 
   const buttons = (
     <Flex gap={12} rootClassName={classes['article__buttons']}>
@@ -115,8 +89,6 @@ function ArticleInfo({ article }) {
       </ConfigProvider>
     </Flex>
   )
-
-  const showButtons = fullArticle && authStatus && author.username === curUser.user.username
 
   return (
     <div className={classes['article']}>
@@ -149,7 +121,7 @@ function ArticleInfo({ article }) {
       {showButtons ? buttons : null}
     </div>
   )
-}
+})
 
 export default Article
 export { ArticleInfo }

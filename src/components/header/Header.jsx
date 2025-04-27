@@ -1,30 +1,34 @@
 import { Link, useNavigate } from 'react-router'
 import { Flex } from 'antd'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useCallback, useMemo } from 'react'
 
-import apiSlice from '@/redux/apiSlice.js'
+import apiSlice, { useGetUserQuery } from '@/redux/apiSlice.js'
 
-import { setUnauthorized } from '../profile_forms/authSlice.js'
+import { selectAuth, setUnauthorized } from '../profile_forms/authSlice.js'
 
 import classes from './header.module.scss'
 import avatar from './image/avatar.jpg'
 
-function Header({ authStatus }) {
+function Header() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { data: curUser } = apiSlice.endpoints.getUser.useQueryState()
+  const authStatus = useSelector(selectAuth)
+  const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.jwt
+
+  const { data: curUser } = useGetUserQuery(undefined, { skip: !jwt })
   const username = curUser?.user?.username || ''
   const userImage = curUser?.user?.image || avatar
 
-  function handleLogout(evt) {
+  const handleLogout = useCallback((evt) => {
     evt.preventDefault()
-    localStorage.setItem('blogAuthTokenData', JSON.stringify({ jwt: '', expiresAt: '', email: curUser.user.email }))
+    localStorage.setItem('blogAuthTokenData', JSON.stringify({ jwt: '', expiresAt: '', email: curUser?.user.email }))
     dispatch(setUnauthorized())
     dispatch(apiSlice.util.invalidateTags(['Article']))
     navigate('/')
-  }
+  }, [curUser, dispatch, navigate])
 
-  const signIn = (
+  const signIn = useMemo(() =>(
     <Link
       to={'/sign-in'}
       className={`
@@ -34,9 +38,9 @@ function Header({ authStatus }) {
     >
       Sign In
     </Link>
-  )
+  ),[])
 
-  const logOut = (
+  const logOut = useMemo(() => (
     <Link
       to={'/'}
       className={`
@@ -47,9 +51,9 @@ function Header({ authStatus }) {
     >
       Log Out
     </Link>
-  )
+  ), [])
 
-  const signUp = (
+  const signUp = useMemo(() => (
     <Link
       to={'/sign-up'}
       className={`
@@ -59,9 +63,9 @@ function Header({ authStatus }) {
     >
       Sign Up
     </Link>
-  )
+  ), [])
 
-  const userActionsPanel = (
+  const userActionsPanel = useMemo(() => (
     <div className={classes['header__actions-panel']}>
       <Link
         to={'/new-article'}
@@ -77,7 +81,7 @@ function Header({ authStatus }) {
         <img className={classes['header__profile-img']} src={userImage} alt="аватар" />
       </Link>
     </div>
-  )
+  ), [username, userImage])
 
   return (
     <header className={classes['header']}>

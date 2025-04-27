@@ -1,10 +1,10 @@
 import { Button, Checkbox, Form, Input, Spin } from 'antd'
 import { Link, useNavigate } from 'react-router'
 import { Controller, useForm } from 'react-hook-form'
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
-import apiSlice, { useCreateNewUserMutation } from '@/redux/apiSlice.js'
+import { useCreateNewUserMutation } from '@/redux/apiSlice.js'
 
 import { useLogin } from '../hooks.js'
 import classes from '../profile-form.module.scss'
@@ -13,8 +13,7 @@ function RegisterForm() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [createNewUser, { data, isLoading: isCreateUser, isError, error }] = useCreateNewUserMutation()
-  const { refetch } = apiSlice.endpoints.getUser.useQuerySubscription()
-  useLogin({ user: data, dispatch, navigate, isRegister: true }, refetch)
+  useLogin({ user: data, dispatch, navigate})
 
   const {
     handleSubmit,
@@ -40,9 +39,9 @@ function RegisterForm() {
     }
   }, [isError])
 
-  const onSubmit = async (formData) => {
+  const onSubmit = useCallback(async (formData) => {
     await createNewUser({ formData })
-  }
+  }, [createNewUser])
 
   const registerContent = (
     <div className={classes['form']}>
