@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router'
 import { ConfigProvider } from 'antd'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useEffect, useMemo } from 'react'
 
 import { useGetUserQuery } from '@/redux/apiSlice.js'
@@ -13,15 +13,13 @@ import RegisterForm from '../profile_forms/register_form/RegisterForm.jsx'
 import LoginForm from '../profile_forms/login_form/LoginForm.jsx'
 import EditProfileForm from '../profile_forms/edit_profile_form/EditProfileForm.jsx'
 import PrivateRoute from '../privet_route/PrivetRoute.jsx'
-import { selectAuth, setAuthorized } from '../profile_forms/authSlice.js'
+import { setAuthorized } from '../profile_forms/authSlice.js'
 
 import classes from './app.module.scss'
 import { theme } from './antTheme.js'
 
 function App() {
-  console.log('Render App')
   const dispatch = useDispatch()
-  const authStatus = useSelector(selectAuth)
   const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.jwt
   const { isSuccess } = useGetUserQuery(undefined, { skip: !jwt })
 
@@ -43,24 +41,24 @@ function App() {
           key={path}
           path={path}
           element={
-            <PrivateRoute authStatus={authStatus}>
+            <PrivateRoute>
               {element}
             </PrivateRoute>
           }
         />
       )),
-    [privateRoutes, authStatus]
+    [privateRoutes]
   )
-
 
   return (
     <ConfigProvider theme={theme}>
-      <Header authStatus={authStatus} />
+      <Header />
       <main className={classes['main']}>
         <Routes>
           <Route path="/articles/:slug" element={<Article />}></Route>
           <Route path="/sign-up" element={<RegisterForm />}></Route>
           <Route path="/sign-in" element={<LoginForm />}></Route>
+          <Route path="/articles" element={<ArticleList />}></Route>
           <Route path="/" element={<ArticleList />}></Route>
           {privateRoutesComponents}
         </Routes>

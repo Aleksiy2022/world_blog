@@ -1,7 +1,7 @@
 import { Button, Checkbox, Form, Input, Spin } from 'antd'
 import { Link, useNavigate } from 'react-router'
 import { Controller, useForm } from 'react-hook-form'
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { useCreateNewUserMutation } from '@/redux/apiSlice.js'
@@ -39,9 +39,9 @@ function RegisterForm() {
     }
   }, [isError])
 
-  const onSubmit = async (formData) => {
+  const onSubmit = useCallback(async (formData) => {
     await createNewUser({ formData })
-  }
+  }, [createNewUser])
 
   const registerContent = (
     <div className={classes['form']}>
