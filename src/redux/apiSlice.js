@@ -40,6 +40,7 @@ const blogApiSlice = createApi({
         method: 'POST',
         body: { user: formData },
       }),
+      invalidatesTags: ['Article'],
     }),
     getUser: builder.query({
       query: () => ({
