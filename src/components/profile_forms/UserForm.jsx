@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import apiSlice, { useCreateNewUserMutation, useLoginMutation, useGetUserQuery, useUpdateUserMutation } from '@/redux/apiSlice.js'
+import apiSlice, { useCreateNewUserMutation, useLoginMutation, useUpdateUserMutation } from '@/redux/apiSlice.js'
 
 import { useLogin } from './hooks.js'
 import classes from './profile-form.module.scss'
@@ -13,14 +13,15 @@ import { getJwtExpiration } from './utils.js'
 function UserForm({ register, login, edit }) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const mode = register ? 'register' : edit ? 'edit' : 'login'
   const [createNewUser, { data: newUser, isLoading: isCreatingUser, isError: isCreateError, error: createError }] =
     useCreateNewUserMutation()
 
   const [updateUser, { data: updatedUser, isLoading: isUpdatingUser, isError: isUpdatingError, error: updateError }] =
     useUpdateUserMutation()
-  const { data: curUser, isLoading: isGetingUser } = useGetUserQuery()
+  const { data: curUser, isLoading: isGetingUser } = apiSlice.endpoints.getUser.useQueryState()
   const { refetch } = apiSlice.endpoints.getUser.useQuerySubscription()
-  const [loginUser, { data: userData, isLoading: isLoging, isError: isLoginError, loginError }] = useLoginMutation()
+  const [loginUser, { data: userData, isLoading: isLoging, isError: isLoginError, error: loginError }] = useLoginMutation()
   const email = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.email
 
   const user = newUser ? newUser : userData
@@ -150,7 +151,10 @@ function UserForm({ register, login, edit }) {
     <Form.Item
       label="Password"
       validateStatus={errors.password ? 'error' : ''}
-      help={errors.password ? errors.password.message : ''}
+      help={
+        errors.password
+          ? loginError ? loginError.data.errors.password : errors.password.message : ''
+      }
     >
       <Controller
         name="password"
@@ -201,7 +205,7 @@ function UserForm({ register, login, edit }) {
         rules={{
           validate: {
             isUrl: (value) => {
-              if (!value) return true // если поле не обязательно
+              if (!value) return true
               try {
                 new URL(value)
                 return true
@@ -231,64 +235,44 @@ function UserForm({ register, login, edit }) {
     </Form.Item>
   )
 
-  const registerFields = (
-    <>
-      {usernameField}
-      {emailField}
-      {passwordField}
-      {repeatPasswordField}
-      {checkboxField}
-    </>
-  )
-
-  const editFields = (
-    <>
-      {usernameField}
-      {emailField}
-      {passwordField}
-      {imageFiled}
-    </>
-  )
-
-  const loginFields = (
-    <>
-      {emailField}
-      {passwordField}
-    </>
-  )
-
-  let formTitle
-  if (register) {
-    formTitle = 'Create new account'
+  const formConfigs = {
+    register: {
+      fields: (
+        <>
+          {usernameField}
+          {emailField}
+          {passwordField}
+          {repeatPasswordField}
+          {checkboxField}
+        </>
+      ),
+      title: 'Create new account',
+      btnText: 'Create'
+    },
+    edit: {
+      fields: (
+        <>
+          {usernameField}
+          {emailField}
+          {passwordField}
+          {imageFiled}
+        </>
+      ),
+      title: 'Edit Profile',
+      btnText: 'Save'
+    },
+    login: {
+      fields: (
+        <>
+          {emailField}
+          {passwordField}
+        </>
+      ),
+      title: 'Sign In',
+      btnText: 'Login'
+    }
   }
-  if (edit) {
-    formTitle = 'Edit Profile'
-  }
-  if (login) {
-    formTitle = 'Sign In'
-  }
-
-  let formFields
-  if (register) {
-    formFields = registerFields
-  }
-  if (edit) {
-    formFields = editFields
-  }
-  if (login) {
-    formFields = loginFields
-  }
-
-  let formBtnText
-  if (register) {
-    formBtnText = 'Create'
-  }
-  if (edit) {
-    formBtnText = 'Save'
-  }
-  if (login) {
-    formBtnText = 'Login'
-  }
+  const { fields: formFields, title: formTitle, btnText: formBtnText } = formConfigs[mode]
 
   const prompt = (
     <span className={classes['form__prompt']}>
