@@ -4,19 +4,18 @@ import { useForm, Controller } from 'react-hook-form'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
+import { useLoginMutation } from '@/redux/apiSlice.js'
+
 import { setAuthorized } from '../authSlice.js'
 import classes from '../profile-form.module.scss'
 import { getJwtExpiration } from '../utils.js'
-
-// eslint-disable-next-line import/no-unresolved
-import { useLoginMutation } from '@/redux/apiSlice.js'
 
 function LoginForm() {
   const dispatch = useDispatch()
   let navigate = useNavigate()
 
   const [login, { isError, error }] = useLoginMutation()
-  const savedRegData = JSON.parse(localStorage.getItem('blogRegisterData'))
+  const email = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.email
   const {
     handleSubmit,
     control,
@@ -24,7 +23,7 @@ function LoginForm() {
     setError,
   } = useForm({
     defaultValues: {
-      email: savedRegData?.email,
+      email: email ? email : '',
       password: '',
     },
   })
@@ -37,14 +36,13 @@ function LoginForm() {
   }, [isError])
 
   const onSubmit = async (formData) => {
-    const loginData = { user: { ...formData } }
-    const response = await login({ loginData })
+    const response = await login({ formData })
     const userData = response.data?.user
 
     if (userData) {
-      const authJwt = userData.token
-      const expiresAt = getJwtExpiration(authJwt)
-      localStorage.setItem('blogAuthTokenData', JSON.stringify({ authJwt: authJwt, expiresAt: expiresAt }))
+      const jwt = userData.token
+      const expiresAt = getJwtExpiration(jwt)
+      localStorage.setItem('blogAuthTokenData', JSON.stringify({ jwt: jwt, expiresAt: expiresAt }))
       dispatch(setAuthorized())
       navigate('/')
     }
@@ -87,7 +85,7 @@ function LoginForm() {
       <span className={classes['form__prompt']}>
         Dont`t have an account?{' '}
         <Link to="/sign-up" className={classes['form__link']}>
-          Sign Un
+          Sign Up
         </Link>
       </span>
     </div>

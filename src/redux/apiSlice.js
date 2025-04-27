@@ -2,110 +2,95 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const blogApiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://blog-platform.kata.academy/api' }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://blog-platform.kata.academy/api',
+    prepareHeaders: (headers) => {
+      const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.jwt
+      if (jwt) headers.set('Authorization', `Bearer ${jwt}`)
+      return headers
+    },
+  }),
   tagTypes: ['User', 'Article'],
   endpoints: (builder) => ({
     getArticles: builder.query({
-      query: ({ limit, offset, jwt = null }) => ({
+      query: ({ limit, offset }) => ({
         url: `/articles?limit=${limit}&offset=${offset}`,
         method: 'GET',
-        headers: jwt ? { Authorization: `Bearer ${jwt}` } : undefined,
       }),
       providesTags: ['Article'],
     }),
     getArticleBySlug: builder.query({
-      query: ({ slug, jwt = null }) => ({
+      query: ({ slug }) => ({
         url: `/articles/${slug}`,
         method: 'GET',
-        headers: jwt ? { Authorization: `Bearer ${jwt}` } : undefined,
       }),
       providesTags: ['Article'],
     }),
     createNewUser: builder.mutation({
-      query: ({ userData }) => ({
+      query: ({ formData }) => ({
         url: '/users',
         method: 'POST',
-        body: userData,
+        body: { user: formData },
       }),
+      invalidatesTags: ['User'],
     }),
     login: builder.mutation({
-      query: ({ loginData }) => ({
+      query: ({ formData }) => ({
         url: '/users/login',
         method: 'POST',
-        body: loginData,
+        body: { user: formData },
       }),
     }),
     getUser: builder.query({
-      query: ({ jwt }) => ({
+      query: () => ({
         url: `/user`,
         method: 'GET',
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
       }),
       providesTags: ['User'],
       invalidatesTags: ['Article'],
     }),
     updateUser: builder.mutation({
-      query: ({ userData, jwt }) => ({
+      query: ({ formData }) => ({
         url: `/user`,
         method: 'PUT',
-        body: { user: userData },
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
+        body: { user: formData },
       }),
       invalidatesTags: ['User', 'Article'],
     }),
     favoriteArticle: builder.mutation({
-      query: ({ slug, jwt }) => ({
+      query: ({ slug }) => ({
         url: `/articles/${slug}/favorite`,
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
       }),
       invalidatesTags: ['Article'],
     }),
     unFavoriteArticle: builder.mutation({
-      query: ({ slug, jwt }) => ({
+      query: ({ slug }) => ({
         url: `/articles/${slug}/favorite`,
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
       }),
       invalidatesTags: ['Article'],
     }),
     createArticle: builder.mutation({
-      query: ({ newArticle, jwt }) => ({
+      query: ({ newArticle }) => ({
         url: '/articles',
         method: 'POST',
         body: newArticle,
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
       }),
       invalidatesTags: ['Article'],
     }),
     deleteArticle: builder.mutation({
-      query: ({ slug, jwt }) => ({
+      query: ({ slug }) => ({
         url: `/articles/${slug}`,
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
       }),
       invalidatesTags: ['Article'],
     }),
     updateArticle: builder.mutation({
-      query: ({ updatedArticle, slug, jwt }) => ({
+      query: ({ updatedArticle, slug }) => ({
         url: `/articles/${slug}`,
         method: 'PUT',
         body: updatedArticle,
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
       }),
       invalidatesTags: ['Article'],
     }),
@@ -119,6 +104,7 @@ export const {
   useCreateNewUserMutation,
   useLoginMutation,
   useGetUserQuery,
+  useGetUserQuerySubscription,
   useUpdateUserMutation,
   useFavoriteArticleMutation,
   useUnFavoriteArticleMutation,

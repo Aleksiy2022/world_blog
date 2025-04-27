@@ -4,16 +4,17 @@ import { Controller, useForm } from 'react-hook-form'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import classes from '../profile-form.module.scss'
-import { getJwtExpiration } from '../utils.js'
-import { setAuthorized } from '../authSlice.js'
+import apiSlice, { useCreateNewUserMutation } from '@/redux/apiSlice.js'
 
-// eslint-disable-next-line import/no-unresolved
-import { useCreateNewUserMutation } from '@/redux/apiSlice.js'
+import { useLogin } from '../hooks.js'
+import classes from '../profile-form.module.scss'
 
 function RegisterForm() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const [createNewUser, { data, isLoading: isCreateUser, isError, error }] = useCreateNewUserMutation()
+  const { refetch } = apiSlice.endpoints.getUser.useQuerySubscription()
+  useLogin({ user: data, dispatch, navigate, isRegister: true }, refetch)
 
   const {
     handleSubmit,
@@ -30,8 +31,6 @@ function RegisterForm() {
     },
   })
 
-  const [createNewUser, { isLoading: isCreateUset, isError, error }] = useCreateNewUserMutation()
-
   useEffect(() => {
     if (error?.data.errors.username) {
       setError('username', error.data.errors.username)
@@ -42,23 +41,7 @@ function RegisterForm() {
   }, [isError])
 
   const onSubmit = async (formData) => {
-    const userData = {
-      user: {
-        username: formData.username,
-        email: formData.email.toLowerCase(),
-        password: formData.password,
-      },
-    }
-    const response = await createNewUser({ userData })
-    const newUser = response.data?.user
-
-    if (userData) {
-      const authJwt = newUser.token
-      const expiresAt = getJwtExpiration(authJwt)
-      localStorage.setItem('blogAuthTokenData', JSON.stringify({ authJwt: authJwt, expiresAt: expiresAt }))
-      dispatch(setAuthorized())
-      navigate('/')
-    }
+    await createNewUser({ formData })
   }
 
   const registerContent = (
@@ -168,7 +151,7 @@ function RegisterForm() {
         </Form.Item>
       </Form>
       <span className={classes['form__prompt']}>
-        Already have an account?
+        Already have an account?{' '}
         <Link to="/sign-in" className={classes['form__link']}>
           Sign In
         </Link>
@@ -176,7 +159,7 @@ function RegisterForm() {
     </div>
   )
 
-  if (isCreateUset) {
+  if (isCreateUser) {
     return (
       <Spin tip="Loading..." size="large">
         {registerContent}

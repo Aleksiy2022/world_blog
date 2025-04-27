@@ -2,15 +2,14 @@ import { Button, Form, Input, Spin } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { useEffect } from 'react'
 
-import classes from '../profile-form.module.scss'
-
-// eslint-disable-next-line import/no-unresolved
 import { useGetUserQuery, useUpdateUserMutation } from '@/redux/apiSlice.js'
 
+import classes from '../profile-form.module.scss'
+import { getJwtExpiration } from '../utils.js'
+
 function EditForm() {
-  const [updateUser, { isLoading: isUpdate, isError, error }] = useUpdateUserMutation()
-  const jwt = JSON.parse(localStorage.getItem('blogAuthTokenData')).authJwt
-  const { data, isLoading: isGetUser } = useGetUserQuery({ jwt })
+  const [updateUser, { data: updatedUser, isLoading: isUpdate, isError, error }] = useUpdateUserMutation()
+  const { data: curUser, isLoading: isGetUser } = useGetUserQuery()
 
   const {
     handleSubmit,
@@ -28,12 +27,12 @@ function EditForm() {
   })
 
   useEffect(() => {
-    if (data) {
-      setValue('username', data.user.username)
-      setValue('email', data.user.email)
-      setValue('image', data.user.image)
+    if (curUser) {
+      setValue('username', curUser.user.username)
+      setValue('email', curUser.user.email)
+      setValue('image', curUser.user.image)
     }
-  }, [data])
+  }, [curUser])
 
   useEffect(() => {
     if (error?.data.errors.username) {
@@ -44,12 +43,12 @@ function EditForm() {
     }
   }, [isError])
 
-  const onSubmit = async (userData) => {
-    const response = await updateUser({ userData, jwt })
-    if (!isError) {
-      const newRegJwt = response.data.user.token
-      const email = response.data.user.email
-      localStorage.setItem('blogRegisterData', JSON.stringify({ token: newRegJwt, email: email }))
+  const onSubmit = async (formData) => {
+    await updateUser({ formData })
+    if (updatedUser) {
+      const jwt = updatedUser.user.token
+      const expiresAt = getJwtExpiration(jwt)
+      localStorage.setItem('blogAuthTokenData', JSON.stringify({ jwt: jwt, expiresAt: expiresAt }))
     }
   }
 
