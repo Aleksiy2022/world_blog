@@ -54,24 +54,18 @@ const ArticleInfo = memo(function ArticleInfo({ article }) {
   const { fullArticle, title, slug, favorited, favoritesCount, tagList, description, author, createdAt, updatedAt } =
     article
   const articleDate = format(new Date(updatedAt ? updatedAt : createdAt), 'MMMM d, yyyy')
-  const {
-    handleFavorite,
-    handleDeleteArticle,
-    handleEditArticle,
-    username,
-    isFavorite,
-    isUnfavorite,
-    isDeleting,
-  } = useArticleActions(slug, favorited)
+  const { handleFavorite, handleDeleteArticle, handleEditArticle, username, isFavorite, isUnfavorite, isDeleting } =
+    useArticleActions(slug, favorited)
   const showButtons = fullArticle && authStatus && author.username === username
 
-  const tagsToView = useMemo(() =>
+  const tagsToView = useMemo(
+    () =>
       tagList.map((tag, index) => (
         <li key={index}>
           <Tag rootClassName={classes['article__tag']}>{tag}</Tag>
         </li>
       )),
-    [tagList, classes],
+    [tagList, classes]
   )
 
   const buttons = (
@@ -109,7 +103,11 @@ const ArticleInfo = memo(function ArticleInfo({ article }) {
               {title}
             </Link>
           </h5>
-          <button className={classes['article__favorite-btn']} onClick={handleFavorite} disabled={isFavorite || isUnfavorite}>
+          <button
+            className={classes['article__favorite-btn']}
+            onClick={handleFavorite}
+            disabled={isFavorite || isUnfavorite}
+          >
             <img
               src={favorited ? favoriteImage : unFavoriteImage}
               alt="лайка"

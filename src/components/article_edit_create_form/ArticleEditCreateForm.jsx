@@ -9,8 +9,8 @@ import { theme } from './antdTheme.js'
 
 function ArticleEditCreateForm() {
   const navigate = useNavigate()
-  const [createArticle, {data: createdArticle, isSuccess}] = useCreateArticleMutation()
-  const [updateArticle, {isLoading: isUdating}] = useUpdateArticleMutation()
+  const [createdArticle, { isLoading: isCreating, isSuccess }] = useCreateArticleMutation()
+  const [updatedArticle, { isLoading: isUpdating }] = useUpdateArticleMutation()
 
   const { slug } = useParams()
   const { data, isLoading: isGettingArticle } = useGetArticleBySlugQuery({ slug }, { skip: !slug })
@@ -44,9 +44,9 @@ function ArticleEditCreateForm() {
       article: { ...data, tagList: tagList },
     }
     if (!slug) {
-      await createArticle({ newArticle })
+      await createdArticle({ newArticle })
     } else {
-      await updateArticle({ updatedArticle: newArticle, slug })
+      await updatedArticle({ updatedArticle: newArticle, slug })
       navigate(`/articles/${slug}`)
     }
   }
@@ -56,7 +56,7 @@ function ArticleEditCreateForm() {
     navigate(`/articles/${newArticleSlug}`)
   }
 
-  if (isUdating || isGettingArticle) return <Skeleton active />
+  if (isUpdating || isGettingArticle) return <Skeleton active />
 
   return (
     <ConfigProvider theme={theme}>
@@ -147,7 +147,12 @@ function ArticleEditCreateForm() {
           </Col>
         </Row>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className={classes['form__send-btn']}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className={classes['form__send-btn']}
+            disabled={isCreating || isUpdating}
+          >
             Send
           </Button>
         </Form.Item>
