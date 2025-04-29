@@ -8,14 +8,13 @@ function ArticleEditPrivetRoute({ children }) {
   const authStatus = useSelector(selectAuth)
   const params = useParams()
   const slug = params?.slug
-  const { data: curUser } = useGetUserQuery(undefined, { skip: true })
-  const { data: curArticle } = useGetArticleBySlugQuery({ slug }, { skip: true })
+  const { data: curUser } = useGetUserQuery()
+  const { data: curArticle } = useGetArticleBySlugQuery({ slug })
 
   if (!authStatus) return <Navigate to={`/articles/${slug}`} />
 
-  const showArticleEdit = curUser?.user.username === curArticle?.article.author
-
-  return showArticleEdit ? children : Navigate(`/articles/${slug}`)
+  const showArticleEdit = curUser?.user.username === curArticle?.article.author.username
+  return showArticleEdit ? children : <Navigate to ={`/articles/${slug}`} />
 }
 
 export default ArticleEditPrivetRoute

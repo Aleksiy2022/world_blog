@@ -9,8 +9,8 @@ import { theme } from './antdTheme.js'
 
 function ArticleEditCreateForm() {
   const navigate = useNavigate()
-  const [createdArticle, { isLoading: isCreating, isSuccess }] = useCreateArticleMutation()
-  const [updatedArticle, { isLoading: isUpdating }] = useUpdateArticleMutation()
+  const [createArticle, { data: createdArticle, isLoading: isCreating, isSuccess }] = useCreateArticleMutation()
+  const [updateArticle, { isLoading: isUpdating }] = useUpdateArticleMutation()
 
   const { slug } = useParams()
   const { data, isLoading: isGettingArticle } = useGetArticleBySlugQuery({ slug }, { skip: !slug })
@@ -44,9 +44,9 @@ function ArticleEditCreateForm() {
       article: { ...data, tagList: tagList },
     }
     if (!slug) {
-      await createdArticle({ newArticle })
+      await createArticle({ newArticle })
     } else {
-      await updatedArticle({ updatedArticle: newArticle, slug })
+      await updateArticle({ updatedArticle: newArticle, slug })
       navigate(`/articles/${slug}`)
     }
   }
