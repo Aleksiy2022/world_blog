@@ -144,7 +144,7 @@ function RegisterForm() {
         </Form.Item>
 
         <Form.Item>
-          <Button className={classes['form__btn']} type="primary" block htmlType="submit" disabled={isCreateUser}>
+          <Button className={classes['form__btn']} type="primary" block htmlType="submit">
             Create
           </Button>
         </Form.Item>

@@ -12,7 +12,8 @@ import { useLogin } from '../hooks.js'
 function LoginForm() {
   const dispatch = useDispatch()
   let navigate = useNavigate()
-  const [login, {data, isError, error, isLoading }] = useLoginMutation()
+
+  const [login, {data, isError, error }] = useLoginMutation()
   useLogin({ user: data, dispatch, navigate})
 
   const email = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.email
@@ -68,7 +69,7 @@ function LoginForm() {
           />
         </Form.Item>
         <Form.Item>
-          <Button rootClassName={classes['form__btn']} type="primary" block htmlType="submit" disabled={isLoading}>
+          <Button rootClassName={classes['form__btn']} type="primary" block htmlType="submit">
             Login
           </Button>
         </Form.Item>

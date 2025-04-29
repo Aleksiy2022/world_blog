@@ -13,9 +13,9 @@ import { selectAuth } from '../profile_forms/authSlice.js'
 function useArticleActions(slug, favorited) {
   const authStatus = useSelector(selectAuth);
   const navigate = useNavigate();
-  const [favoriteArticle, {isLoading: isFavorite}] = useFavoriteArticleMutation();
-  const [unFavoriteArticle, {isLoading: isUnfavorite}] = useUnFavoriteArticleMutation();
-  const [deleteArticle, {isLoading: isDeleting}] = useDeleteArticleMutation();
+  const [favoriteArticle] = useFavoriteArticleMutation();
+  const [unFavoriteArticle] = useUnFavoriteArticleMutation();
+  const [deleteArticle] = useDeleteArticleMutation();
   const { data: curUser } = apiSlice.endpoints.getUser.useQueryState()
 
   const handleFavorite = useCallback(() => {
@@ -41,7 +41,7 @@ function useArticleActions(slug, favorited) {
 
   const username = curUser?.user?.username
 
-  return { handleFavorite, handleDeleteArticle, handleEditArticle, username, isFavorite, isUnfavorite, isDeleting}
+  return { handleFavorite, handleDeleteArticle, handleEditArticle, username }
 }
 
 export { useArticleActions }
