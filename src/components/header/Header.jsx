@@ -20,68 +20,83 @@ function Header() {
   const username = curUser?.user?.username || ''
   const userImage = curUser?.user?.image || avatar
 
-  const handleLogout = useCallback((evt) => {
-    evt.preventDefault()
-    localStorage.setItem('blogAuthTokenData', JSON.stringify({ jwt: '', expiresAt: '', email: curUser?.user.email }))
-    dispatch(setUnauthorized())
-    dispatch(apiSlice.util.invalidateTags(['Article']))
-    navigate('/')
-  }, [curUser, dispatch, navigate])
+  const handleLogout = useCallback(
+    (evt) => {
+      evt.preventDefault()
+      localStorage.setItem('blogAuthTokenData', JSON.stringify({ jwt: '', expiresAt: '', email: curUser?.user.email }))
+      dispatch(setUnauthorized())
+      dispatch(apiSlice.util.invalidateTags(['Article']))
+      navigate('/')
+    },
+    [curUser, dispatch, navigate]
+  )
 
-  const signIn = useMemo(() =>(
-    <Link
-      to={'/sign-in'}
-      className={`
+  const signIn = useMemo(
+    () => (
+      <Link
+        to={'/sign-in'}
+        className={`
             ${classes['header__link']}
             ${classes['header__link--sign-in']}
           `}
-    >
-      Sign In
-    </Link>
-  ),[])
+      >
+        Sign In
+      </Link>
+    ),
+    []
+  )
 
-  const logOut = useMemo(() => (
-    <Link
-      to={'/'}
-      className={`
+  const logOut = useMemo(
+    () => (
+      <Link
+        to={'/'}
+        className={`
             ${classes['header__link']}
             ${classes['header__link--log-out']}
           `}
-      onClick={handleLogout}
-    >
-      Log Out
-    </Link>
-  ), [])
+        onClick={handleLogout}
+      >
+        Log Out
+      </Link>
+    ),
+    []
+  )
 
-  const signUp = useMemo(() => (
-    <Link
-      to={'/sign-up'}
-      className={`
+  const signUp = useMemo(
+    () => (
+      <Link
+        to={'/sign-up'}
+        className={`
             ${classes['header__link']}
             ${classes['header__link--sign-up']}
           `}
-    >
-      Sign Up
-    </Link>
-  ), [])
+      >
+        Sign Up
+      </Link>
+    ),
+    []
+  )
 
-  const userActionsPanel = useMemo(() => (
-    <div className={classes['header__actions-panel']}>
-      <Link
-        to={'/new-article'}
-        className={`
+  const userActionsPanel = useMemo(
+    () => (
+      <div className={classes['header__actions-panel']}>
+        <Link
+          to={'/new-article'}
+          className={`
             ${classes['header__link']}
             ${classes['header__link--article']}
           `}
-      >
-        Create article
-      </Link>
-      <Link to={'/profile'} className={classes['header__profile-link']}>
-        <span>{username}</span>
-        <img className={classes['header__profile-img']} src={userImage} alt="аватар" />
-      </Link>
-    </div>
-  ), [username, userImage])
+        >
+          Create article
+        </Link>
+        <Link to={'/profile'} className={classes['header__profile-link']}>
+          <span>{username}</span>
+          <img className={classes['header__profile-img']} src={userImage} alt="аватар" />
+        </Link>
+      </div>
+    ),
+    [username, userImage]
+  )
 
   return (
     <header className={classes['header']}>

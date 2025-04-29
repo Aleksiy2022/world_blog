@@ -12,8 +12,8 @@ import { useLogin } from '../hooks.js'
 function LoginForm() {
   const dispatch = useDispatch()
   let navigate = useNavigate()
-  const [login, {data, isError, error, isLoading }] = useLoginMutation()
-  useLogin({ user: data, dispatch, navigate})
+  const [login, { data, isError, error, isLoading }] = useLoginMutation()
+  useLogin({ user: data, dispatch, navigate })
 
   const email = JSON.parse(localStorage.getItem('blogAuthTokenData'))?.email
   const {

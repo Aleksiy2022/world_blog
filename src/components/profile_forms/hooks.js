@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { getJwtExpiration } from './utils.js'
 import { setAuthorized } from './authSlice.js'
 
-function useLogin({ user, dispatch, navigate, }) {
+function useLogin({ user, dispatch, navigate }) {
   useEffect(() => {
     if (user) {
       const jwt = user.user.token
