@@ -13,7 +13,7 @@ function ArticleEditCreateForm() {
   const [updateArticle, {isLoading: isUdating}] = useUpdateArticleMutation()
 
   const { slug } = useParams()
-  const { data } = useGetArticleBySlugQuery({ slug }, { skip: !slug })
+  const { data, isLoading: isGettingArticle } = useGetArticleBySlugQuery({ slug }, { skip: !slug })
   const tagsToEdit = data?.article.tagList.map((item) => ({ tag: item }))
 
   const {
@@ -56,7 +56,7 @@ function ArticleEditCreateForm() {
     navigate(`/articles/${newArticleSlug}`)
   }
 
-  if (isUdating) return <Skeleton active />
+  if (isUdating || isGettingArticle) return <Skeleton active />
 
   return (
     <ConfigProvider theme={theme}>
