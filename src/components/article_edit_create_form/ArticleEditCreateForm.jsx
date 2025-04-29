@@ -1,4 +1,4 @@
-import { Input, Form, Typography, Button, Flex, Row, Col, ConfigProvider } from 'antd'
+import { Input, Form, Typography, Button, Flex, Row, Col, ConfigProvider, Skeleton } from 'antd'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router'
 
@@ -10,7 +10,7 @@ import { theme } from './antdTheme.js'
 function ArticleEditCreateForm() {
   const navigate = useNavigate()
   const [createArticle, {data: createdArticle, isSuccess}] = useCreateArticleMutation()
-  const [updateArticle] = useUpdateArticleMutation()
+  const [updateArticle, {isLoading: isUdating}] = useUpdateArticleMutation()
 
   const { slug } = useParams()
   const { data } = useGetArticleBySlugQuery({ slug }, { skip: !slug })
@@ -55,6 +55,8 @@ function ArticleEditCreateForm() {
     const newArticleSlug = createdArticle.article.slug
     navigate(`/articles/${newArticleSlug}`)
   }
+
+  if (isUdating) return <Skeleton active />
 
   return (
     <ConfigProvider theme={theme}>
