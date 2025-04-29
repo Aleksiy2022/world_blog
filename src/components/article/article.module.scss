@@ -30,7 +30,11 @@
     display: block;
     font-weight: 400;
     color: #1890ff;
+    height: 22.4px;
     overflow-y: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    white-space: normal;
   }
 
   &__favorite-btn {
