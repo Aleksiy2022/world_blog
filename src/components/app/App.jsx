@@ -12,7 +12,8 @@ import ArticleEditCreateForm from '../article_edit_create_form/ArticleEditCreate
 import RegisterForm from '../profile_forms/register_form/RegisterForm.jsx'
 import LoginForm from '../profile_forms/login_form/LoginForm.jsx'
 import EditProfileForm from '../profile_forms/edit_profile_form/EditProfileForm.jsx'
-import PrivateRoute from '../privet_route/PrivetRoute.jsx'
+import PrivateRoute from '../privet_routes/PrivetRoute.jsx'
+import ArticleEditPrivetRoute from '../privet_routes/ArticleEditPrivetRoute.jsx'
 import { setAuthorized } from '../profile_forms/authSlice.js'
 
 import classes from './app.module.scss'
@@ -30,7 +31,6 @@ function App() {
   }, [isSuccess])
 
   const privateRoutes = useMemo(() => [
-    { path: '/articles/:slug/edit', element: <ArticleEditCreateForm /> },
     { path: '/profile', element: <EditProfileForm /> },
     { path: '/new-article', element: <ArticleEditCreateForm /> }
   ], [])
@@ -55,11 +55,16 @@ function App() {
       <Header />
       <main className={classes['main']}>
         <Routes>
-          <Route path="/articles/:slug" element={<Article />}></Route>
-          <Route path="/sign-up" element={<RegisterForm />}></Route>
-          <Route path="/sign-in" element={<LoginForm />}></Route>
-          <Route path="/articles" element={<ArticleList />}></Route>
-          <Route path="/" element={<ArticleList />}></Route>
+          <Route path='/articles/:slug/edit' element={
+            <ArticleEditPrivetRoute>
+              <ArticleEditCreateForm />
+            </ArticleEditPrivetRoute>
+          } />
+          <Route path='/articles/:slug' element={<Article />} />
+          <Route path='/sign-up' element={<RegisterForm />} />
+          <Route path='/sign-in' element={<LoginForm />} />
+          <Route path='/articles' element={<ArticleList />} />
+          <Route path='/' element={<ArticleList />} />
           {privateRoutesComponents}
         </Routes>
       </main>

@@ -9,8 +9,8 @@ import { theme } from './antdTheme.js'
 
 function ArticleEditCreateForm() {
   const navigate = useNavigate()
-  const [createArticle] = useCreateArticleMutation()
-  const [updateArticle] = useUpdateArticleMutation()
+  const [createArticle, {isLoading: isCreating}] = useCreateArticleMutation()
+  const [updateArticle, {isLoading: isUpdating}] = useUpdateArticleMutation()
 
   const { slug } = useParams()
   const { data } = useGetArticleBySlugQuery({ slug }, { skip: !slug })
@@ -141,7 +141,12 @@ function ArticleEditCreateForm() {
           </Col>
         </Row>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className={classes['form__send-btn']}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className={classes['form__send-btn']}
+            disabled={isCreating || isUpdating}
+          >
             Send
           </Button>
         </Form.Item>
