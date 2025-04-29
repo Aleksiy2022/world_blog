@@ -13,7 +13,7 @@ function RegisterForm() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [createNewUser, { data, isLoading: isCreateUser, isError, error }] = useCreateNewUserMutation()
-  useLogin({ user: data, dispatch, navigate})
+  useLogin({ user: data, dispatch, navigate })
 
   const {
     handleSubmit,
@@ -39,9 +39,12 @@ function RegisterForm() {
     }
   }, [isError])
 
-  const onSubmit = useCallback(async (formData) => {
-    await createNewUser({ formData })
-  }, [createNewUser])
+  const onSubmit = useCallback(
+    async (formData) => {
+      await createNewUser({ formData })
+    },
+    [createNewUser]
+  )
 
   const registerContent = (
     <div className={classes['form']}>
