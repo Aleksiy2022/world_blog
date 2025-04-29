@@ -149,7 +149,7 @@ function EditForm() {
         </Form.Item>
 
         <Form.Item>
-          <Button rootClassName={classes['form__btn']} type="primary" block htmlType="submit">
+          <Button rootClassName={classes['form__btn']} type="primary" block htmlType="submit" disabled={isUpdate}>
             Save
           </Button>
         </Form.Item>

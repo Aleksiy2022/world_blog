@@ -9,7 +9,7 @@ import { theme } from './antdTheme.js'
 
 function ArticleEditCreateForm() {
   const navigate = useNavigate()
-  const [createArticle] = useCreateArticleMutation()
+  const [createArticle, {data: createdArticle, isSuccess}] = useCreateArticleMutation()
   const [updateArticle] = useUpdateArticleMutation()
 
   const { slug } = useParams()
@@ -45,11 +45,15 @@ function ArticleEditCreateForm() {
     }
     if (!slug) {
       await createArticle({ newArticle })
-      navigate('/')
     } else {
       await updateArticle({ updatedArticle: newArticle, slug })
       navigate(`/articles/${slug}`)
     }
+  }
+
+  if (isSuccess) {
+    const newArticleSlug = createdArticle.article.slug
+    navigate(`/articles/${newArticleSlug}`)
   }
 
   return (
