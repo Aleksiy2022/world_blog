@@ -5,7 +5,7 @@ import { Alert, Tag, Button, Flex, ConfigProvider, Popconfirm, Skeleton } from '
 import { useSelector } from 'react-redux'
 import { memo, useMemo } from 'react'
 
-import { useGetArticleBySlugQuery, } from '@/redux/apiSlice.js'
+import { useGetArticleBySlugQuery } from '@/redux/apiSlice.js'
 
 import { selectAuth } from '../profile_forms/authSlice.js'
 
@@ -54,7 +54,15 @@ const ArticleInfo = memo(function ArticleInfo({ article }) {
   const { fullArticle, title, slug, favorited, favoritesCount, tagList, description, author, createdAt, updatedAt } =
     article
   const articleDate = format(new Date(updatedAt ? updatedAt : createdAt), 'MMMM d, yyyy')
-  const { handleFavorite, handleDeleteArticle, handleEditArticle, username } = useArticleActions(slug, favorited)
+  const {
+    handleFavorite,
+    handleDeleteArticle,
+    handleEditArticle,
+    username,
+    isFavorite,
+    isUnfavorite,
+    isDeleting,
+  } = useArticleActions(slug, favorited)
   const showButtons = fullArticle && authStatus && author.username === username
 
   const tagsToView = useMemo(() =>
@@ -63,7 +71,7 @@ const ArticleInfo = memo(function ArticleInfo({ article }) {
           <Tag rootClassName={classes['article__tag']}>{tag}</Tag>
         </li>
       )),
-    [tagList, classes]
+    [tagList, classes],
   )
 
   const buttons = (
@@ -77,7 +85,7 @@ const ArticleInfo = memo(function ArticleInfo({ article }) {
           cancelText="No"
           placement="rightTop"
         >
-          <Button variant="outlined" color="primary">
+          <Button variant="outlined" color="primary" disabled={isDeleting}>
             Delete
           </Button>
         </Popconfirm>
@@ -90,6 +98,8 @@ const ArticleInfo = memo(function ArticleInfo({ article }) {
     </Flex>
   )
 
+  if (isDeleting) return <Skeleton active />
+
   return (
     <div className={classes['article']}>
       <div className={classes['article__info']}>
@@ -99,7 +109,7 @@ const ArticleInfo = memo(function ArticleInfo({ article }) {
               {title}
             </Link>
           </h5>
-          <button className={classes['article__favorite-btn']} onClick={handleFavorite}>
+          <button className={classes['article__favorite-btn']} onClick={handleFavorite} disabled={isFavorite || isUnfavorite}>
             <img
               src={favorited ? favoriteImage : unFavoriteImage}
               alt="лайка"

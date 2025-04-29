@@ -1,6 +1,6 @@
 import { Button, Form, Input, Spin } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 import { useGetUserQuery, useUpdateUserMutation } from '@/redux/apiSlice.js'
 
@@ -52,7 +52,7 @@ function EditForm() {
     }
   }
 
-  const content = useMemo(() => (
+  const content = (
     <div className={classes['form']}>
       <h4 className={classes['form__title']}>Edit Profile</h4>
       <Form layout="vertical" onFinish={handleSubmit(onSubmit)} style={{ width: '100%' }}>
@@ -149,13 +149,13 @@ function EditForm() {
         </Form.Item>
 
         <Form.Item>
-          <Button rootClassName={classes['form__btn']} type="primary" block htmlType="submit">
+          <Button rootClassName={classes['form__btn']} type="primary" block htmlType="submit" disabled={isUpdate}>
             Save
           </Button>
         </Form.Item>
       </Form>
     </div>
-  ), [isError, error])
+  )
 
   if (isGetUser || isUpdate) {
     return (
